@@ -1,0 +1,30 @@
+<ion-list>
+  <ion-list-header>
+    <ion-label>History</ion-label>
+  </ion-list-header>
+  @for (event of $events(); track event.id) {
+    <ion-item>
+      <ion-icon [name]="iconFor(event.type)" slot="start" />
+      <ion-label class="ion-text-wrap">
+        <h3>{{ event.type }}</h3>
+        @if (event.note) {
+          <p>{{ event.note }}</p>
+        }
+        @if (event.type === 'transferred' && event.fromOwner && event.toOwner) {
+          <p>
+            <ion-text color="medium">
+              {{ event.fromOwner.spaceID }} ({{ event.fromOwner.ownerType }})
+              →
+              {{ event.toOwner.spaceID }} ({{ event.toOwner.ownerType }})
+            </ion-text>
+          </p>
+        }
+        <ion-note>{{ event.occurredAt }}</ion-note>
+      </ion-label>
+    </ion-item>
+  } @empty {
+    <ion-item lines="none">
+      <ion-label color="medium">No history events yet.</ion-label>
+    </ion-item>
+  }
+</ion-list>
