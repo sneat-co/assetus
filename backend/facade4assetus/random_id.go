@@ -11,3 +11,8 @@ const assetIDLength = 6
 func newAssetID() string {
 	return random.ID(assetIDLength)
 }
+
+// newHistoryEventID generates a random history-event ID.
+func newHistoryEventID() string {
+	return random.ID(assetIDLength)
+}

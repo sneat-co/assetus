@@ -67,6 +67,19 @@ func CreateAsset(ctx facade.ContextWithUser, request dto4assetus.CreateAssetRequ
 				return fmt.Errorf("failed to insert asset record: %w", err)
 			}
 
+			// Record the Purchased lifecycle event in the asset's append-only
+			// history, in the same transaction as the asset insert.
+			purchased := &dbo4assetus.AssetHistoryEventDbo{
+				AssetHistoryEventBase: dbo4assetus.AssetHistoryEventBase{
+					Type:       const4assetus.HistoryEventPurchased,
+					OccurredAt: now,
+					ActorRef:   userID,
+				},
+			}
+			if err = dal4assetus.AppendHistoryEvent(ctx, tx, request.SpaceID, assetID, newHistoryEventID(), purchased); err != nil {
+				return fmt.Errorf("failed to record Purchased history event: %w", err)
+			}
+
 			brief := dbo4assetus.BriefFromAsset(assetID, asset)
 			if params.SpaceModuleEntry.Data.Assets == nil {
 				params.SpaceModuleEntry.Data.Assets = make(dbo4assetus.AssetBriefs, 1)
