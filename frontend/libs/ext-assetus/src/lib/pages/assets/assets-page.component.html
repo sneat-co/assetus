@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button />
+    </ion-buttons>
+    <ion-title>Assets</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="newAsset()">
+        <ion-icon name="add" slot="icon-only" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="$filter()" (ionChange)="setFilter($event)">
+      <ion-segment-button value="active">
+        <ion-label>Active</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="archived">
+        <ion-label>Archived</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @for (row of visibleAssets; track row.id) {
+      <ion-item button (click)="goAsset(row)">
+        <ion-label>
+          <h2>{{ row.dbo.name }}</h2>
+          <ion-note>{{ row.dbo.category }} · {{ row.dbo.condition }}</ion-note>
+        </ion-label>
+        <ion-badge slot="end">{{ row.dbo.visibility }}</ion-badge>
+      </ion-item>
+    } @empty {
+      <ion-item lines="none">
+        <ion-label class="ion-text-center ion-text-wrap">
+          @if ($filter() === 'archived') {
+            No archived assets.
+          } @else {
+            No assets yet. Tap + to add one.
+          }
+        </ion-label>
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>
