@@ -10,4 +10,5 @@ import (
 // (create/manage/remove/transfer/get) are added here as they land.
 func RegisterHttpRoutes(handle extension.HTTPHandleFunc) {
 	handle(http.MethodPost, "/v0/assetus/create_asset", httpPostCreateAsset)
+	handle(http.MethodGet, "/v0/assetus/asset", httpGetAsset)
 }
