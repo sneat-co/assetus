@@ -1,0 +1,29 @@
+<ion-list>
+  <ion-item>
+    <ion-select
+      label="Space"
+      [value]="$spaceID()"
+      [disabled]="$disabled()"
+      (ionChange)="onSpaceSelected($event)"
+    >
+      @for (space of $spaces(); track space.id) {
+        <ion-select-option [value]="space.id">
+          {{ space.brief.title || (space.brief.type | titlecase) }}
+        </ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  @if (space?.id) {
+    <ion-item
+      button
+      [routerLink]="['/space', space.type, space.id, 'assets']"
+      (click)="closeMenu()"
+    >
+      <ion-icon name="cube" slot="start" />
+      <ion-label>Assets</ion-label>
+    </ion-item>
+  }
+</ion-list>
+
+<sneat-auth-menu-item />
