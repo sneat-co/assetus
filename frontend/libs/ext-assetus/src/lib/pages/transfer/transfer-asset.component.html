@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title>Transfer asset</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-select
+        label="Destination space"
+        labelPlacement="stacked"
+        [(ngModel)]="toSpaceID"
+        placeholder="Select a space"
+      >
+        @for (space of $spaces(); track space.id) {
+          <ion-select-option [value]="space.id">
+            {{ space.brief.title || space.id }}
+          </ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  <ion-button
+    expand="block"
+    (click)="transfer()"
+    [disabled]="transferring || !toSpaceID"
+  >
+    Transfer
+  </ion-button>
+</ion-content>
