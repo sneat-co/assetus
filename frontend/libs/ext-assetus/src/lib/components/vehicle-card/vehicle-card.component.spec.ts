@@ -1,13 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { FormControl } from '@angular/forms';
-import { AssetService } from '@sneat/ext-assetus-components';
 import { spacePageTestProviders } from '../../../testing/test-providers';
 import { VehicleCardComponent } from './vehicle-card.component';
 
 // Render + logic spec for the ported VehicleCardComponent. It composes the
-// make-model / engine / possession / reg-number children, so it needs the
-// standard provider chain plus a stub legacy AssetService for the reg-number
-// child.
+// make-model / engine / possession / reg-number children and needs the
+// standard provider chain.
 describe('VehicleCardComponent', () => {
   let fixture: ReturnType<typeof TestBed.createComponent<VehicleCardComponent>>;
   let component: VehicleCardComponent;
@@ -15,10 +13,7 @@ describe('VehicleCardComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [VehicleCardComponent],
-      providers: [
-        ...spacePageTestProviders(),
-        { provide: AssetService, useValue: { updateAsset: vi.fn() } },
-      ],
+      providers: [...spacePageTestProviders()],
     });
     fixture = TestBed.createComponent(VehicleCardComponent);
     component = fixture.componentInstance;
@@ -72,12 +67,14 @@ describe('VehicleCardComponent', () => {
   const modelChanged = (m: string): void =>
     (component as unknown as { modelChanged(m: string): void }).modelChanged(m);
 
-  it('sets the regNumber form control from the brief extra on changes', () => {
+  it('sets the regNumber form control from the dbo extra on changes', () => {
     component.vehicleAsset = {
       id: 'a1',
       space: { id: 's1' },
-      brief: { extra: { regNumber: 'AA-11' } },
-      dbo: { category: 'vehicle', extra: { make: '', model: '' } },
+      dbo: {
+        category: 'vehicles',
+        extra: { make: '', model: '', regNumber: 'AA-11' },
+      },
     } as never;
     component.ngOnChanges({ vehicleAsset: {} as never });
     expect(

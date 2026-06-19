@@ -16,21 +16,18 @@ import {
 import { IIdAndBrief } from '@sneat/core';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import {
-  IAssetBrief,
+  IAssetDbo,
   CurrencyList,
   CurrencyCode,
   FuelVolumeUnitTypes,
   FuelVolumeUnit,
   MileageUnit,
   MileageUnitTypes,
-} from '@sneat/mod-assetus-core';
-import {
-  AssetService,
-  IAddVehicleRecordRequest,
-} from '@sneat/ext-assetus-components';
+} from '../../dto';
+import { AssetService, ICreateVehicleRecordRequest } from '../../services';
 import { ISpaceBrief } from '@sneat/dto';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-mileage-dialog',
   templateUrl: './mileage-dialog.component.html',
@@ -55,7 +52,7 @@ export class MileAgeDialogComponent {
   private readonly modalCtrl = inject(ModalController);
 
   @Input() space?: IIdAndBrief<ISpaceBrief>;
-  @Input() asset?: IIdAndBrief<IAssetBrief>;
+  @Input() asset?: IIdAndBrief<IAssetDbo>;
 
   protected currencyList: CurrencyCode[] = CurrencyList;
   protected fuelVolumeUnitTypes = FuelVolumeUnitTypes;
@@ -116,7 +113,7 @@ export class MileAgeDialogComponent {
       );
     }
 
-    const request: IAddVehicleRecordRequest = {
+    const request: ICreateVehicleRecordRequest = {
       spaceID: this.space.id,
       assetID: this.asset.id,
       fuelVolume: this.fuelVolume.value || undefined,

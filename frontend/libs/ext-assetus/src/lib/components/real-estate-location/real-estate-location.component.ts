@@ -8,9 +8,9 @@ import {
   IonLabel,
   IonTextarea,
 } from '@ionic/angular/standalone';
-import { IAssetContext } from '@sneat/mod-assetus-core';
+import { IAssetContext } from '../../contexts';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-real-estate-location',
   templateUrl: './real-estate-location.component.html',

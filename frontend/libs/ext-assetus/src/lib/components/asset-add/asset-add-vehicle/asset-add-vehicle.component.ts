@@ -8,19 +8,20 @@ import {
   AssetVehicleType,
   EngineTypes,
   FuelTypes,
+  IAssetDboBase,
+  IAssetExtra,
+  IAssetVehicleExtra,
+} from '../../../dto';
+import {
   IAssetContext,
   IAssetVehicleContext,
-  IAssetVehicleExtra,
-} from '@sneat/mod-assetus-core';
+} from '../../../contexts';
 import { format, parseISO } from 'date-fns';
-import {
-  AddAssetBaseComponent,
-  ICreateAssetRequest,
-} from '@sneat/ext-assetus-components';
+import { AddAssetBaseComponent } from '../add-asset-base.component';
 import { VehicleCardComponent } from '../../vehicle-card/vehicle-card.component';
 import { ClassName } from '@sneat/ui';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 // Extends the published legacy AddAssetBaseComponent (its createAsset<Extra>
 // flow differs from the MVP AssetService).
 @Component({
@@ -67,12 +68,12 @@ export class AssetAddVehicleComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['space'] && this.space) {
-      const a: IAssetVehicleContext = this.vehicleAsset ?? {
+      const a: IAssetVehicleContext = this.vehicleAsset ?? ({
         id: '',
         space: this.space ?? { id: '' },
         dbo: {
           status: 'draft',
-          category: 'vehicle',
+          category: 'vehicles',
           extraType: 'vehicle',
           extra: {
             make: '',
@@ -80,7 +81,6 @@ export class AssetAddVehicleComponent
             engineFuel: FuelTypes.unknown,
             engineType: EngineTypes.unknown,
           },
-          spaceID: this.space?.id,
           type: this.vehicleType,
           possession: 'owning',
           createdAt: new Date().toISOString() as unknown as timestamp,
@@ -88,7 +88,7 @@ export class AssetAddVehicleComponent
           updatedAt: new Date().toISOString() as unknown as timestamp,
           updatedBy: '-',
         },
-      };
+      } as unknown as IAssetVehicleContext);
       this.vehicleAsset = { ...a, space: this.space };
     }
   }
@@ -112,7 +112,7 @@ export class AssetAddVehicleComponent
             engineType: '',
             engineFuel: '',
           },
-        },
+        } as unknown as IAssetVehicleContext['dbo'],
       };
     }
   }
@@ -135,12 +135,15 @@ export class AssetAddVehicleComponent
       throw new Error('no asset');
     }
     this.isSubmitting = true;
-    let request: ICreateAssetRequest<'vehicle', IAssetVehicleExtra> = {
+    let request: {
+      asset: IAssetDboBase<'vehicle', IAssetVehicleExtra & IAssetExtra>;
+      spaceID: string;
+    } = {
       asset: {
         ...assetDto,
         status: 'active',
-        category: 'vehicle',
-      },
+        category: 'vehicles',
+      } as unknown as IAssetDboBase<'vehicle', IAssetVehicleExtra & IAssetExtra>,
       spaceID: this.space?.id,
     };
     if (this.yearOfBuild) {

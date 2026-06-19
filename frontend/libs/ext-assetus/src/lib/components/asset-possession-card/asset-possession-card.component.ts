@@ -2,13 +2,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonCard, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { ISelectItem, SelectFromListComponent } from '@sneat/ui';
-import {
-  AssetPossession,
-  AssetPossessions,
-  IAssetContext,
-} from '@sneat/mod-assetus-core';
+import { AssetPossession, AssetPossessions } from '../../dto';
+import { IAssetContext } from '../../contexts';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-asset-possession-card',
   templateUrl: './asset-possession-card.component.html',

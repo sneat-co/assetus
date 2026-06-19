@@ -1,4 +1,4 @@
-// Asset-group DTO — ported faithfully from legacy @sneat/mod-assetus-core
+// Asset-group DTO — ported faithfully from legacy legacy mod-assetus-core
 // (core/src/lib/dto/dto-asset.ts: IAssetDtoGroup + IAssetDtoGroupCounts). The new
 // lib already carries an IAssetGroupInfo (the backend AssetGroupInfo projection);
 // IAssetDtoGroup is the legacy UI-facing group DTO the asset-group page binds to.

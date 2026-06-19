@@ -15,19 +15,16 @@ import {
   IonList,
 } from '@ionic/angular/standalone';
 import { CountrySelectorComponent } from '@sneat/components';
-import {
-  carMakes,
-  IAssetContext,
-  IAssetVehicleContext,
-  IAssetVehicleExtra,
-} from '@sneat/mod-assetus-core';
+import { carMakes } from '../../data';
+import { IAssetContext, IAssetVehicleContext } from '../../contexts';
+import { IAssetVehicleExtra } from '../../dto';
 import { ISpaceContext } from '@sneat/space-models';
 import { AssetPossessionCardComponent } from '../asset-possession-card/asset-possession-card.component';
 import { AssetRegNumberInputComponent } from '../asset-reg-number-input/asset-reg-number-input.component';
 import { MakeModelCardComponent } from '../make-model-card/make-model-card.component';
 import { VehicleEngineComponent } from '../vehicle-engine/vehicle-engine.component';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-vehicle-card',
   templateUrl: './vehicle-card.component.html',
@@ -83,7 +80,7 @@ export class VehicleCardComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['vehicleAsset']) {
       if (!this.regNumber.dirty) {
-        const extra = this.vehicleAsset?.brief?.extra as
+        const extra = this.vehicleAsset?.dbo?.extra as
           | IAssetVehicleExtra
           | undefined;
         this.regNumber.setValue(extra?.regNumber || '');

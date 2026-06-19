@@ -15,7 +15,7 @@ export interface IAssetContext
   owner?: IOwner;
 }
 
-// Typed asset-context wrappers — ported from legacy @sneat/mod-assetus-core
+// Typed asset-context wrappers — ported from legacy legacy mod-assetus-core
 // (core/src/lib/contexts/asset-context.ts). Each carries the per-category typed
 // `extra` on its dbo so consumers (e.g. docus) get a strongly-typed extra
 // without losing the base IAssetContext surface (incl. `owner`).

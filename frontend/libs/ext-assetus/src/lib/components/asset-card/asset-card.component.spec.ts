@@ -17,24 +17,24 @@ describe('AssetCardComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('creates and renders the asset title', () => {
+  it('creates and renders the asset name', () => {
     component.asset = {
       id: 'a1',
       space: { id: 's1' },
-      dbo: { category: 'vehicle', title: 'My Car' },
+      dbo: { category: 'vehicles', name: 'My Car' },
     } as never;
     fixture.detectChanges();
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('ion-card-title')?.textContent).toContain('My Car');
   });
 
-  it('switches the default segment to income when incomes outnumber expenses', () => {
+  it('defaults the segment to income when the live financialDirection is income', () => {
     component.asset = {
       id: 'a1',
       space: { id: 's1' },
       dbo: {
-        category: 'vehicle',
-        totals: { incomes: { count: 5 }, expenses: { count: 1 } },
+        category: 'vehicles',
+        financialDirection: 'income',
       },
     } as never;
     component.ngOnChanges({ asset: {} as never });

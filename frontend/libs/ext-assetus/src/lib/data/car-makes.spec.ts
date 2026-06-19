@@ -1,5 +1,5 @@
 // Proves the ported car make/model reference data preserves the legacy
-// @sneat/mod-assetus-core surface (carMakes table + engines + IMake/IModel).
+// legacy mod-assetus-core surface (carMakes table + engines + IMake/IModel).
 import { describe, expect, it } from 'vitest';
 import {
   carMakes,

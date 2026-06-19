@@ -6,7 +6,6 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
-  inject,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -17,13 +16,9 @@ import {
   IonItem,
   IonLabel,
 } from '@ionic/angular/standalone';
-import { AssetService, IUpdateAssetRequest } from '@sneat/ext-assetus-components';
-import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import { ISpaceContext } from '@sneat/space-models';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
-// The legacy AssetService/IUpdateAssetRequest are consumed from the published
-// sibling lib (their request contract differs from the MVP AssetService).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-asset-reg-number',
   templateUrl: 'asset-reg-number-input.component.html',
@@ -38,9 +33,6 @@ import { ISpaceContext } from '@sneat/space-models';
   ],
 })
 export class AssetRegNumberInputComponent implements OnChanges {
-  private readonly assetService = inject(AssetService);
-  private readonly errorLogger = inject<IErrorLogger>(ErrorLogger);
-
   @Input({ required: true }) space?: ISpaceContext;
   @Input({ required: true }) assetID?: string;
   @Input({ required: true }) countyID?: string;
@@ -97,28 +89,15 @@ export class AssetRegNumberInputComponent implements OnChanges {
       return;
     }
 
-    const request: IUpdateAssetRequest = {
-      spaceID: space.id,
-      assetID: this.assetID,
-      assetCategory: 'vehicle',
-      regNumber: this.regNumberControl.value || '',
-    };
-    this.isSaving = true;
-    this.regNumberControl.disable();
-    this.assetService.updateAsset(request).subscribe({
-      next: () => {
-        this.regNumberControl.markAsPristine();
-        this.isSaving = false;
-        this.regNumberControl.enable();
-      },
-      error: (e) => {
-        setTimeout(() => {
-          this.isSaving = false;
-          this.regNumberControl.enable();
-        }, 1000);
-        this.errorLogger.logError(e, 'Failed to save registration number');
-      },
-    });
+    // The reg-number is persisted via the parent's full-asset save: on the live
+    // assetus backend the registration number lives in the vehicle's typed
+    // `extra` and update_asset is a full-asset update (name/category/condition/
+    // visibility required), so a standalone reg-number-only HTTP update — the
+    // dead legacy `assets/update_asset` contract — no longer exists. We emit the
+    // value upward (the parent vehicle-card folds it into the asset and saves)
+    // and mark the control pristine to reflect the committed value.
+    this.regNumberChange.emit(this.regNumberControl.value || '');
+    this.regNumberControl.markAsPristine();
   }
 
   public focusToRegNumberInput(): void {

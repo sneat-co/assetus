@@ -1,4 +1,4 @@
-// AssetGroup uimodel — ported faithfully from legacy @sneat/mod-assetus-core
+// AssetGroup uimodel — ported faithfully from legacy legacy mod-assetus-core
 // (core/src/lib/uimodels/asset-group.ts). Wraps an IAssetGroupContext and exposes
 // the group's id, totals and counts. Consumed by budgetus.
 

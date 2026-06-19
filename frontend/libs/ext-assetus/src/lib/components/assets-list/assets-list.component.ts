@@ -16,14 +16,14 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { IIdAndBrief } from '@sneat/core';
-import { AssetCategory, IAssetBrief } from '@sneat/mod-assetus-core';
+import { AssetCategory, IAssetDbo } from '../../dto';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import { ISpaceContext } from '@sneat/space-models';
 import { SpaceNavService } from '@sneat/space-services';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../services';
 import { MileAgeDialogComponent } from '../mileage-dialog/mileage-dialog.component';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-assets-list',
   templateUrl: './assets-list.component.html',
@@ -44,17 +44,17 @@ export class AssetsListComponent implements OnChanges {
   private readonly spaceNavService = inject(SpaceNavService);
   private readonly modalCtrl = inject(ModalController);
 
-  protected assets?: IIdAndBrief<IAssetBrief>[];
-  protected mileAgeAsset?: IIdAndBrief<IAssetBrief>;
+  protected assets?: IIdAndBrief<IAssetDbo>[];
+  protected mileAgeAsset?: IIdAndBrief<IAssetDbo>;
 
-  @Input() allAssets?: IIdAndBrief<IAssetBrief>[];
+  @Input() allAssets?: IIdAndBrief<IAssetDbo>[];
   @Input({ required: true }) space?: ISpaceContext;
   @Input() assetType?: AssetCategory;
   @Input() filter = '';
 
   @Input() sorter: (
-    a: IIdAndBrief<IAssetBrief>,
-    b: IIdAndBrief<IAssetBrief>,
+    a: IIdAndBrief<IAssetDbo>,
+    b: IIdAndBrief<IAssetDbo>,
   ) => number = () => {
     return 0;
   };
@@ -78,7 +78,7 @@ export class AssetsListComponent implements OnChanges {
       this.assets = allAssets?.filter(
         (asset) =>
           (!assetType || asset?.brief?.category === assetType) &&
-          (!filter || asset?.brief?.title?.toLowerCase().includes(f) || -1),
+          (!filter || asset?.brief?.name?.toLowerCase().includes(f) || -1),
       );
     }
     this.assets = this.assets ? [...this.assets].sort(this.sorter) : this.assets;
@@ -94,7 +94,7 @@ export class AssetsListComponent implements OnChanges {
     );
   }
 
-  protected goAsset(asset: IIdAndBrief<IAssetBrief>): void {
+  protected goAsset(asset: IIdAndBrief<IAssetDbo>): void {
     if (!asset) {
       return;
     }
@@ -113,7 +113,7 @@ export class AssetsListComponent implements OnChanges {
       );
   }
 
-  protected delete(event: Event, asset: IIdAndBrief<IAssetBrief>): void {
+  protected delete(event: Event, asset: IIdAndBrief<IAssetDbo>): void {
     event.stopPropagation();
     event.preventDefault();
     const { id, brief } = asset;
@@ -126,7 +126,7 @@ export class AssetsListComponent implements OnChanges {
           `Are you sure you want to delete this asset?
 
        ID: ${id}
-       Title: ${brief?.title}
+       Title: ${brief?.name}
 
        This operation can not be undone.`,
         )
@@ -134,21 +134,23 @@ export class AssetsListComponent implements OnChanges {
         deleteCompleted();
         return;
       }
-      this.assetService.deleteAsset(this.space?.id || '', asset.id).subscribe({
-        next: () => {
-          this.assets = this.assets?.filter((a) => a.id !== id);
-        },
-        error: this.errorLogger.logErrorHandler(
-          'failed to delete an asset with ID=' + id,
-        ),
-        complete: deleteCompleted,
-      });
+      this.assetService
+        .removeAsset({ spaceID: this.space?.id || '', assetID: asset.id })
+        .subscribe({
+          next: () => {
+            this.assets = this.assets?.filter((a) => a.id !== id);
+          },
+          error: this.errorLogger.logErrorHandler(
+            'failed to delete an asset with ID=' + id,
+          ),
+          complete: deleteCompleted,
+        });
     }, 1);
   }
 
   protected async addNewMilesAndFuel(
     event: Event,
-    asset: IIdAndBrief<IAssetBrief>,
+    asset: IIdAndBrief<IAssetDbo>,
   ) {
     event.stopPropagation();
     event.preventDefault();

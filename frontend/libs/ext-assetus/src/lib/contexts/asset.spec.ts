@@ -1,5 +1,5 @@
 // Proves the ported typed asset-context wrappers preserve the legacy
-// @sneat/mod-assetus-core surface: each carries its per-category typed extra on
+// legacy mod-assetus-core surface: each carries its per-category typed extra on
 // the dbo while keeping the base IAssetContext shape (incl. owner + brief).
 import { describe, expect, it } from 'vitest';
 import {

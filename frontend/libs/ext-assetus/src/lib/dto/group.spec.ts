@@ -1,5 +1,5 @@
 // Proves the ported asset-group DTO preserves the legacy
-// @sneat/mod-assetus-core surface (IAssetDtoGroup + IAssetDtoGroupCounts).
+// legacy mod-assetus-core surface (IAssetDtoGroup + IAssetDtoGroupCounts).
 import { describe, expect, it } from 'vitest';
 import { type IAssetDtoGroup, type IAssetDtoGroupCounts } from './group';
 

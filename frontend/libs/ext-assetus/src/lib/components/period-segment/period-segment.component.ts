@@ -6,7 +6,7 @@ import {
 } from '@ionic/angular/standalone';
 import { Period } from '@sneat/dto';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-period-segment',
   templateUrl: './period-segment.component.html',

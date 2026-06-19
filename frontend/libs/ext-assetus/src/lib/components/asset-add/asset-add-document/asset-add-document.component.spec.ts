@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { WritableSignal } from '@angular/core';
 import { EMPTY } from 'rxjs';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../../services';
 import { spacePageTestProviders } from '../../../../testing/test-providers';
 import { AssetAddDocumentComponent } from './asset-add-document.component';
 
@@ -25,7 +25,7 @@ describe('AssetAddDocumentComponent', () => {
     ({
       id: 'a1',
       space: { id: 's1' },
-      dbo: { category: 'vehicle', extra: {} },
+      dbo: { category: 'document', extra: {} },
     }) as never;
 
   beforeEach(() => {
@@ -146,11 +146,12 @@ describe('AssetAddDocumentComponent', () => {
     expect(
       (component as unknown as { isSubmitting: boolean }).isSubmitting,
     ).toBe(true);
-    const request = createAsset.mock.calls[0][1] as {
-      asset: { status: string; yearOfBuild: number };
+    const request = createAsset.mock.calls[0][0] as {
+      status: string;
+      yearOfBuild: number;
     };
-    expect(request.asset.status).toBe('active');
-    expect(request.asset.yearOfBuild).toBe(2019);
+    expect(request.status).toBe('active');
+    expect(request.yearOfBuild).toBe(2019);
   });
 
   it('submitDocumentForm omits yearOfBuild when it is blank', () => {
@@ -160,9 +161,9 @@ describe('AssetAddDocumentComponent', () => {
     (
       component as unknown as { submitDocumentForm(): void }
     ).submitDocumentForm();
-    const request = createAsset.mock.calls[0][1] as {
-      asset: { yearOfBuild?: number };
+    const request = createAsset.mock.calls[0][0] as {
+      yearOfBuild?: number;
     };
-    expect(request.asset.yearOfBuild).toBeUndefined();
+    expect(request.yearOfBuild).toBeUndefined();
   });
 });

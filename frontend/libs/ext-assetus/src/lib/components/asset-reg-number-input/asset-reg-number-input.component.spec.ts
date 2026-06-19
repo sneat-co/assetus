@@ -1,26 +1,21 @@
 import { TestBed } from '@angular/core/testing';
-import { AssetService } from '@sneat/ext-assetus-components';
-import { of, throwError } from 'rxjs';
 import { componentTestProviders } from '../../../testing/test-providers';
 import { AssetRegNumberInputComponent } from './asset-reg-number-input.component';
 
-// Render + logic spec for the ported AssetRegNumberInputComponent. It injects
-// the legacy AssetService and the ErrorLogger; both are stubbed.
+// Render + logic spec for the ported AssetRegNumberInputComponent. The reg
+// number is now persisted via the parent's full-asset save (the live
+// assetus backend has no standalone reg-number update); submit() propagates the
+// value upward and marks the control pristine.
 describe('AssetRegNumberInputComponent', () => {
-  let updateAsset: ReturnType<typeof vi.fn>;
   let fixture: ReturnType<
     typeof TestBed.createComponent<AssetRegNumberInputComponent>
   >;
   let component: AssetRegNumberInputComponent;
 
   beforeEach(() => {
-    updateAsset = vi.fn(() => of(undefined));
     TestBed.configureTestingModule({
       imports: [AssetRegNumberInputComponent],
-      providers: [
-        ...componentTestProviders(),
-        { provide: AssetService, useValue: { updateAsset } },
-      ],
+      providers: [...componentTestProviders()],
     });
     fixture = TestBed.createComponent(AssetRegNumberInputComponent);
     component = fixture.componentInstance;
@@ -40,41 +35,9 @@ describe('AssetRegNumberInputComponent', () => {
     ).toBe('ABC123');
   });
 
-  it('submit posts an update request via AssetService when space+asset are set', () => {
-    component.space = { id: 's1' } as never;
-    component.assetID = 'a1';
-    (component as unknown as { regNumberControl: { setValue(v: string): void } })
-      .regNumberControl.setValue('XYZ789');
-
-    (component as unknown as { submit(): void }).submit();
-
-    expect(updateAsset).toHaveBeenCalledWith(
-      expect.objectContaining({ spaceID: 's1', assetID: 'a1', regNumber: 'XYZ789' }),
-    );
-  });
-
-  it('submit is a no-op without a space id', () => {
-    component.space = undefined;
-    component.assetID = 'a1';
-    (component as unknown as { submit(): void }).submit();
-    expect(updateAsset).not.toHaveBeenCalled();
-  });
-
-  it('re-enables the control when the update fails', () => {
-    updateAsset.mockReturnValueOnce(throwError(() => new Error('boom')));
-    component.space = { id: 's1' } as never;
-    component.assetID = 'a1';
-    const control = (
-      component as unknown as { regNumberControl: { setValue(v: string): void } }
-    ).regNumberControl;
-    control.setValue('XYZ789');
-
-    (component as unknown as { submit(): void }).submit();
-
-    expect(updateAsset).toHaveBeenCalledTimes(1);
-  });
-
-  it('markAsPristine on success and re-enables the control', () => {
+  it('submit propagates the reg number upward and marks the control pristine', () => {
+    const regNumberChange = vi.fn();
+    component.regNumberChange.subscribe(regNumberChange);
     component.space = { id: 's1' } as never;
     component.assetID = 'a1';
     const control = (
@@ -83,7 +46,6 @@ describe('AssetRegNumberInputComponent', () => {
           setValue(v: string): void;
           markAsDirty(): void;
           dirty: boolean;
-          enabled: boolean;
         };
       }
     ).regNumberControl;
@@ -92,8 +54,17 @@ describe('AssetRegNumberInputComponent', () => {
 
     (component as unknown as { submit(): void }).submit();
 
+    expect(regNumberChange).toHaveBeenCalledWith('XYZ789');
     expect(control.dirty).toBe(false);
-    expect(control.enabled).toBe(true);
+  });
+
+  it('submit is a no-op without a space id', () => {
+    const regNumberChange = vi.fn();
+    component.regNumberChange.subscribe(regNumberChange);
+    component.space = undefined;
+    component.assetID = 'a1';
+    (component as unknown as { submit(): void }).submit();
+    expect(regNumberChange).not.toHaveBeenCalled();
   });
 
   it('showSave reflects an unsaved dirty change and the hideSaveButton flag', () => {

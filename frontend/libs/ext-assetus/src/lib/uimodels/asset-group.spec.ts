@@ -1,5 +1,5 @@
 // Proves the ported AssetGroup uimodel preserves the legacy
-// @sneat/mod-assetus-core behaviour (id, totals, numberOf).
+// legacy mod-assetus-core behaviour (id, totals, numberOf).
 import { describe, expect, it } from 'vitest';
 import { AssetGroup } from './asset-group';
 import { type IAssetGroupContext } from '../contexts';

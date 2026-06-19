@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { ModalController } from '@ionic/angular/standalone';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../services';
 import { of } from 'rxjs';
 import { componentTestProviders } from '../../../testing/test-providers';
 import { MileAgeDialogComponent } from './mileage-dialog.component';
 
 // Render + logic spec for the ported MileAgeDialogComponent. It injects the
-// legacy AssetService, the ModalController and the ErrorLogger; all stubbed.
+// lib's AssetService, the ModalController and the ErrorLogger; all stubbed.
 describe('MileAgeDialogComponent', () => {
   let addVehicleRecord: ReturnType<typeof vi.fn>;
   let dismiss: ReturnType<typeof vi.fn>;

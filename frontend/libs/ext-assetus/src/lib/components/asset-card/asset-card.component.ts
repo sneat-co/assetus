@@ -9,9 +9,9 @@ import {
   IonLabel,
 } from '@ionic/angular/standalone';
 import { Period } from '@sneat/dto';
-import { IAssetContext } from '@sneat/mod-assetus-core';
+import { IAssetContext } from '../../contexts';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-asset-card',
   templateUrl: './asset-card.component.html',
@@ -33,9 +33,11 @@ export class AssetCardComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['asset'] && this.asset) {
-      const incomes = this.asset?.dbo?.totals?.incomes,
-        expenses = this.asset?.dbo?.totals?.expenses;
-      if (incomes && (!expenses || incomes.count > expenses.count)) {
+      // Default the segment from the live backend `financialDirection` field
+      // (IAssetDbo). The legacy nested {incomes,expenses} totals shape this
+      // previously inspected no longer exists on the live assetus backend
+      // (totals is now IMoney[]).
+      if (this.asset?.dbo?.financialDirection === 'income') {
         this.segment = 'income';
       }
     }

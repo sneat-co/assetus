@@ -1,33 +1,35 @@
 import { TestBed } from '@angular/core/testing';
 import { ModalController, provideIonicAngular } from '@ionic/angular/standalone';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../services';
 import { SpaceNavService } from '@sneat/space-services';
 import { of } from 'rxjs';
 import { componentTestProviders } from '../../../testing/test-providers';
 import { AssetsListComponent } from './assets-list.component';
 
-// Render + logic spec for the ported AssetsListComponent. It injects the legacy
+// Render + logic spec for the ported AssetsListComponent. It injects the lib's
 // AssetService, the SpaceNavService, the ModalController and the ErrorLogger.
 describe('AssetsListComponent', () => {
   let navigate: ReturnType<typeof vi.fn>;
-  let deleteAsset: ReturnType<typeof vi.fn>;
+  let removeAsset: ReturnType<typeof vi.fn>;
   let fixture: ReturnType<typeof TestBed.createComponent<AssetsListComponent>>;
   let component: AssetsListComponent;
 
   const assets = [
-    { id: 'a1', brief: { category: 'dwelling', title: 'House' } },
-    { id: 'a2', brief: { category: 'vehicle', title: 'Car' } },
+    { id: 'a1', brief: { category: 'dwelling', name: 'House' } },
+    { id: 'a2', brief: { category: 'vehicles', name: 'Car' } },
   ];
 
   // Rich fixture that exercises every template branch: a vehicle with
   // make/model + regNumber badge, and a dwelling with address + yearOfBuild.
+  // Shapes mirror the live IAssetDbo (name, the 'vehicles' category, and the
+  // typed extra on the dbo).
   const richAssets = [
     {
       id: 'v1',
       brief: {
-        category: 'vehicle',
+        category: 'vehicles',
         extraType: 'vehicle',
-        title: 'My Car',
+        name: 'My Car',
         extra: { make: 'Toyota', model: 'Corolla', regNumber: 'ABC123' },
       },
     },
@@ -36,7 +38,7 @@ describe('AssetsListComponent', () => {
       brief: {
         category: 'dwelling',
         extraType: 'dwelling',
-        title: 'Home',
+        name: 'Home',
         yearOfBuild: 1990,
         extra: { address: '1 Main St' },
       },
@@ -45,13 +47,13 @@ describe('AssetsListComponent', () => {
 
   beforeEach(() => {
     navigate = vi.fn(() => Promise.resolve(true));
-    deleteAsset = vi.fn(() => of(undefined));
+    removeAsset = vi.fn(() => of(undefined));
     TestBed.configureTestingModule({
       imports: [AssetsListComponent],
       providers: [
         ...componentTestProviders(),
         provideIonicAngular(),
-        { provide: AssetService, useValue: { deleteAsset } },
+        { provide: AssetService, useValue: { removeAsset } },
         {
           provide: SpaceNavService,
           useValue: { navigateForwardToSpacePage: navigate },
@@ -154,7 +156,7 @@ describe('AssetsListComponent', () => {
     ).delete(event, assets[0]);
     vi.runAllTimers();
 
-    expect(deleteAsset).toHaveBeenCalledWith('s1', 'a1');
+    expect(removeAsset).toHaveBeenCalledWith({ spaceID: 's1', assetID: 'a1' });
     expect(
       (component as unknown as { assets: { id: string }[] }).assets.map(
         (a) => a.id,
@@ -178,7 +180,7 @@ describe('AssetsListComponent', () => {
     ).delete(event, assets[0]);
     vi.runAllTimers();
 
-    expect(deleteAsset).not.toHaveBeenCalled();
+    expect(removeAsset).not.toHaveBeenCalled();
   });
 
   it('opens the mileage dialog modal', async () => {

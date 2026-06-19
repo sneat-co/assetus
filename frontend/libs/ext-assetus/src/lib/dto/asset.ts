@@ -52,6 +52,20 @@ export type AssetPossession =
   | 'leasing'
   | 'renting';
 
+// Legacy possession companions — ported from legacy mod-assetus-core
+// (core/src/lib/dto/assetus-types.ts). AssetPossessions is the ordered option
+// list the possession-card binds (owning/renting/leasing/undisclosed).
+export const AssetPossessionUndisclosed: AssetPossession = 'undisclosed';
+export const AssetPossessionOwning: AssetPossession = 'owning';
+export const AssetPossessionRenting: AssetPossession = 'renting';
+export const AssetPossessionLeasing: AssetPossession = 'leasing';
+export const AssetPossessions: AssetPossession[] = [
+  AssetPossessionOwning,
+  AssetPossessionRenting,
+  AssetPossessionLeasing,
+  AssetPossessionUndisclosed,
+];
+
 // AssetType is the optional per-category subtype (backend const4assetus.Type).
 // It is an open string so any category's subtype set is admitted; the named
 // per-category unions below document the backend sets.
@@ -72,6 +86,10 @@ export type AssetDwellingType =
   | 'land'
   | 'garage'
   | 'warehouse';
+// AssetRealEstateType is the legacy legacy mod-assetus-core name for the
+// dwelling subtype set the add-dwelling component binds; a subset of
+// AssetDwellingType, kept under its original name for the migrated component.
+export type AssetRealEstateType = 'house' | 'apartment' | 'land';
 export type AssetSportsEquipmentType =
   | 'bicycle'
   | 'kite'
@@ -116,11 +134,64 @@ export type FuelType =
   | 'diesel'
   | 'hydrogen';
 
+// Legacy engine/fuel companions — ported faithfully from
+// legacy mod-assetus-core (core/src/lib/dto/assetus-types.ts) so the migrated
+// vehicle components keep their exact const/enum-member references. Values match
+// the EngineType/FuelType unions above.
+export const EngineTypeUnknown = '';
+export const EngineTypeOther = 'other';
+export const EngineTypePHEV = 'phev';
+export const EngineTypeCombustion = 'combustion';
+export const EngineTypeElectric = 'electric';
+export const EngineTypeHybrid = 'hybrid';
+export const EngineTypeSteam = 'steam';
+
+export enum EngineTypes {
+  unknown = '',
+  other = 'other',
+  phev = 'phev',
+  combustion = 'combustion',
+  electric = 'electric',
+  hybrid = 'hybrid',
+  steam = 'steam',
+}
+
+export const FuelTypeUnknown = '';
+export const FuelTypeOther = 'other';
+export const FuelTypePetrol = 'petrol';
+export const FuelTypeDiesel = 'diesel';
+export const FuelTypeHydrogen = 'hydrogen';
+export const FuelTypeElectricity = 'electricity';
+
+export enum FuelTypes {
+  unknown = '',
+  other = 'other',
+  petrol = 'petrol',
+  diesel = 'diesel',
+  hydrogen = 'hydrogen',
+  electricity = 'electricity',
+}
+
 // Fuel-volume unit, mileage unit and currency are OPEN strings on the backend
 // (no typed enum). The named unions below are kept for ergonomics only and MUST
 // serialize as plain strings.
 export type FuelVolumeUnit = 'l' | 'g' | string;
 export type MileageUnit = 'km' | 'mile' | string;
+
+// Legacy unit lists — ported from legacy mod-assetus-core
+// (core/src/lib/dto/assetus-types.ts). The migrated mileage dialog binds these
+// directly as its select-option source.
+export const FuelVolumeUnitTypes: FuelVolumeUnit[] = ['l', 'g'];
+export const MileageUnitTypes: MileageUnit[] = ['km', 'mile'];
+
+// Legacy currency companions — ported from legacy mod-assetus-core
+// (core/src/lib/types.ts). The mileage dialog binds CurrencyList as its
+// currency-select source. IMoney.currency stays an open string; these are the
+// curated picker options only.
+export type CurrencyCode = 'USD' | 'EUR';
+export const CurrencyUSD: CurrencyCode = 'USD';
+export const CurrencyEUR: CurrencyCode = 'EUR';
+export const CurrencyList: CurrencyCode[] = [CurrencyUSD, CurrencyEUR];
 
 export type AssetVisibility =
   | 'private'
@@ -260,6 +331,12 @@ export interface IAssetDbo extends IAssetBrief, IWithSpaceIDs, IWithAssetSpaces 
   yearOfBuild?: number;
   geo?: IGeoPoint;
 
+  // Polymorphic typed extra (backend embeds extra.WithExtraField on the asset):
+  // an `extraType` discriminator plus the typed `extra` map (vehicle/dwelling/
+  // document). Optional — an asset with no extra (empty extraType) stays valid.
+  extraType?: AssetExtraType;
+  extra?: IAssetExtra;
+
   // Embedded AssetDates (flattened, like the backend).
   dateOfBuild?: string;
   dateOfPurchase?: string;
@@ -285,6 +362,48 @@ export interface IAssetDbo extends IAssetBrief, IWithSpaceIDs, IWithAssetSpaces 
   relatedAs?: string;
   memberIDs?: string[];
   membersInfo?: ITitledRecord[];
+}
+
+// AssetExtraType is the polymorphic extra discriminator
+// (backend extras4assetus.AssetExtraType*). Defined here (the foundational dto
+// module) so IAssetDboBase can reference it without importing dto/extras.ts
+// (which itself imports from this module); dto/extras.ts re-exports it.
+export type AssetExtraType = 'vehicle' | 'dwelling' | 'document';
+
+// IAssetExtra is the open per-category extra map (legacy
+// legacy mod-assetus-core IAssetExtra). The typed vehicle/dwelling/document
+// extras in dto/extras.ts are assignable to it.
+export interface IAssetExtra {
+  [key: string]: unknown;
+}
+
+// IAssetDboBase is the generic, in-progress asset DBO the add-asset components
+// build before submit — ported faithfully from legacy legacy mod-assetus-core
+// (core/src/lib/dto/dto-asset.ts IAssetDboBase). It extends the unified
+// IAssetDbo but relaxes the briefs's required name/condition/visibility (the
+// add flow sets `title`/`status`/`category` first) and carries the legacy
+// polymorphic `extraType` + typed `extra`, the working `title`, and the
+// created/updated audit fields. Nothing here is dropped relative to the legacy
+// shape the migrated components relied on.
+export interface IAssetDboBase<
+  ExtraType extends AssetExtraType = AssetExtraType,
+  // The typed vehicle/dwelling/document extras (dto/extras.ts) do not carry an
+  // index signature, so the constraint is the structural `object` rather than
+  // IAssetExtra (the open map). Either an open IAssetExtra or a typed extra fits.
+  Extra extends object = IAssetExtra,
+> extends Omit<
+    IAssetDbo,
+    'name' | 'condition' | 'visibility' | 'type' | 'extraType' | 'extra'
+  > {
+  name?: string;
+  condition?: AssetCondition;
+  visibility?: AssetVisibility;
+  type?: AssetType;
+  title?: string;
+  extraType?: ExtraType;
+  extra?: Extra;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
 // --- History (append-only) ---

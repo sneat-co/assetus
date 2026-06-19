@@ -5,18 +5,19 @@ import { ClassName, ISelectItem, SelectFromListComponent } from '@sneat/ui';
 import { timestamp } from '@sneat/dto';
 import {
   AssetRealEstateType,
+  IAssetDboBase,
+  IAssetExtra,
+  IAssetDwellingExtra,
+} from '../../../dto';
+import {
   IAssetContext,
   IAssetDwellingContext,
-  IAssetDwellingExtra,
-} from '@sneat/mod-assetus-core';
+} from '../../../contexts';
 import { SpaceComponentBaseParams } from '@sneat/space-components';
-import {
-  AddAssetBaseComponent,
-  ICreateAssetRequest,
-} from '@sneat/ext-assetus-components';
+import { AddAssetBaseComponent } from '../add-asset-base.component';
 import { AddDwellingCardComponent } from '../../edit-dwelling-card/edit-dwelling-card.component';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-asset-add-dwelling',
   templateUrl: './asset-add-dwelling.component.html',
@@ -50,7 +51,7 @@ export class AssetAddDwellingComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['space'] && this.space) {
-      this.dwellingAsset = this.dwellingAsset ?? {
+      this.dwellingAsset = this.dwellingAsset ?? ({
         id: '',
         space: this.space ?? { id: '' },
         dbo: {
@@ -60,7 +61,6 @@ export class AssetAddDwellingComponent
           extra: {
             rent_price: { value: 0, currency: 'USD' },
           },
-          spaceID: this.space?.id,
           type: this.dwellingType,
           title: 'My dwelling',
           possession: 'owning',
@@ -69,7 +69,7 @@ export class AssetAddDwellingComponent
           updatedAt: new Date().toISOString() as unknown as timestamp,
           updatedBy: '-',
         },
-      };
+      } as unknown as IAssetDwellingContext);
     }
   }
 
@@ -111,12 +111,15 @@ export class AssetAddDwellingComponent
       }
     }
 
-    const request: ICreateAssetRequest<'dwelling', IAssetDwellingExtra> = {
+    const request: {
+      asset: IAssetDboBase<'dwelling', IAssetDwellingExtra & IAssetExtra>;
+      spaceID: string;
+    } = {
       asset: {
         ...assetDto,
         status: 'active',
         category: 'dwelling',
-      },
+      } as unknown as IAssetDboBase<'dwelling', IAssetDwellingExtra & IAssetExtra>,
       spaceID: this.space?.id,
     };
 

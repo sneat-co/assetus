@@ -1,5 +1,5 @@
 // Car make/model reference data — ported faithfully from the legacy
-// @sneat/mod-assetus-core (core/src/lib/data: car-makes-with-models.ts +
+// legacy mod-assetus-core (core/src/lib/data: car-makes-with-models.ts +
 // vehicles.ts). The new lib's components (make-model-card, vehicle-card) consume
 // `carMakes` and the public `IMake`/`IModel` shapes; nothing is dropped relative
 // to the legacy export surface.

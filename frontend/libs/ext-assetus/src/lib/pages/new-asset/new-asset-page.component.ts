@@ -32,7 +32,7 @@ interface INewAssetCategory {
 
 // "New asset" wizard: pick an asset kind, then render the matching
 // asset-add-* component. Ported from the legacy `new-asset` page; the legacy
-// `@sneat/mod-assetus-core` `IAssetCategory` is replaced with the MVP
+// `legacy mod-assetus-core` `IAssetCategory` is replaced with the MVP
 // `AssetCategory` ids ('vehicles', 'dwelling', 'document').
 @Component({
   imports: [
