@@ -50,7 +50,7 @@ Relocate legacy `extras4assetus` onto the flat core in `assetus/backend`: `WithE
 
 **Verifies:** unified-assetus-data-model#ac:groups-nesting-linking-preserved, unified-assetus-data-model#ac:multispace-with-canonical-owner, unified-assetus-data-model#ac:member-info-preserved
 **Depends-On:** 3
-**Status:** pending
+**Status:** done
 
 Adapt the legacy relationship structures onto the unified record: `WithAssetSpaces` multi-space association preserved alongside the MVP single canonical owning Space (lifecycle/history anchored to the owner); asset groups as a sub-entity (`IAssetDtoGroup` fields `order`/`desc`/`categoryId`/`numberOf`, not just `groupId`); parent/sub-asset nesting with per-sub-asset detail (`ISubAssetInfo`: `type`/`countryId`/`subType`/`expires`); asset linking (`sameAssetID`/`relatedAs`/`linkage`); and per-asset member info (`memberIDs`/`membersInfo`).
 

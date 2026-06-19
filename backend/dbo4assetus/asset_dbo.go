@@ -170,6 +170,12 @@ type AssetBase struct {
 	// NotUsedServiceTypes lists liability service types explicitly not used by
 	// this asset, ported from the legacy notUsedServiceTypes.
 	NotUsedServiceTypes []LiabilityServiceType `json:"notUsedServiceTypes,omitempty" firestore:"notUsedServiceTypes,omitempty"`
+
+	// --- Ported relationship fields (all OPTIONAL) -----------------------
+	// WithAssetRelationships carries the optional group membership, parent/
+	// sub-asset nesting, asset linking (sameAssetID/relatedAs) and per-asset
+	// member info ported from the legacy AssetBrief/AssetDbo and frontend DTO.
+	WithAssetRelationships
 }
 
 // WithPossessionDefault returns the asset's Possession, defaulting to
@@ -249,6 +255,9 @@ func (v AssetBase) Validate() error {
 			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("totals[%d]", i), err.Error())
 		}
 	}
+	if err := v.WithAssetRelationships.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -258,10 +267,15 @@ func (v AssetBase) Validate() error {
 // The owner is the owning Space (carried via WithSpaceIDs); there is no separate
 // owner entity and no sharing/availability fields. ext.yardius is intentionally
 // absent in the MVP.
+// The canonical owning Space — the anchor for lifecycle/history/transfer and
+// owner-derivation — is carried via WithSpaceIDs. WithAssetSpaces is an ADDITIVE
+// multi-space association: the asset can surface under several spaces while the
+// owning Space stays the single authoritative owner.
 type AssetDbo struct {
 	AssetBase
 	dbmodels.WithModified
 	dbmodels.WithSpaceIDs
+	WithAssetSpaces
 }
 
 // Validate returns an error if the record is not valid.
@@ -273,6 +287,9 @@ func (v *AssetDbo) Validate() error {
 		return err
 	}
 	if err := v.AssetBase.Validate(); err != nil {
+		return err
+	}
+	if err := v.WithAssetSpaces.Validate(); err != nil {
 		return err
 	}
 	return nil
