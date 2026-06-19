@@ -66,7 +66,7 @@ Merge the legacy facades/routes (`CreateAsset`/`GetAsset`/`UpdateAsset`/`DeleteA
 
 **Verifies:** unified-assetus-data-model#ac:capability-coverage-complete, unified-assetus-data-model#ac:backend-builds-and-tests-pass
 **Depends-On:** 5
-**Status:** pending
+**Status:** done
 
 Author the capability-coverage table mapping every legacy capability in `docs/legacy-gap-analysis.md` §3.1/§4 (corrected for the audit findings) to its unified home — concrete field, intentional change, or named sibling Feature. Make the merged `assetus/backend` module compile and pass tests (`go build ./...` and `go test ./...` from `backend/`), and write the retirement note listing which legacy directories (and consumers to repoint: `brandus/dbo4brands/make_test.go`, `standard_extensions.go`, `sneat-apps`) become deletable.
 
