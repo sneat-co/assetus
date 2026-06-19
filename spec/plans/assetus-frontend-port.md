@@ -36,7 +36,7 @@ Relocate the legacy enums (`sneat-libs/.../core/src/lib/dto/assetus-types.ts`) a
 
 **Verifies:** assetus-frontend-port#ac:vehicle-extra-frontend-no-field-dropped, assetus-frontend-port#ac:document-extra-frontend-full-shape
 **Depends-On:** 1
-**Status:** in-progress
+**Status:** done
 
 Relocate the legacy typed-extra DTOs into `assetus/frontend/libs/ext-assetus/src/lib/dto/`, resolved by `extraType` ∈ {`vehicle`,`dwelling`,`document`}, mirroring the backend `extras4assetus` shapes (REQ:backend-wire-contract). Vehicle (`backend/extras4assetus/asset_vehicle.go`+`with_engine_data.go`+`with_make_model.go`): `make`/`model`/`regNumber`/`vin`, engine `engineType`/`engineFuel`/`engineCC`/`engineKW`/`engineNM`/`engineSerialNumber`, plain due-dates `nctExpires`/`taxExpires`/`nextServiceDue` (no task-link IDs on the backend — port plain dates). Vehicle record: both the persisted `VehicleRecordDbo{fuel:{volume,unit,amount,fuelCost,currency},mileage:{value,unit}}` (`backend/dbo4assetus/vehicle_record_dbo.go`) and the flat append request `AddVehicleRecordRequest{fuelVolume,fuelVolumeUnit,fuelCost,currency,mileage,mileageUnit}` (`backend/dto4assetus/add_vehicle_record.go`) — units/currency as plain strings. Dwelling (`backend/extras4assetus/asset_dwelling.go`): `address`/`rent_price`(`{value,currency}`)/`numberOfBedrooms`/`areaSqM`. Document (`backend/extras4assetus/asset_document.go`+`doc_type_schema.go`): `docType` (`passport`/`id_card`/`driving_license`/`marriage_cert`/`birth_cert`)/`number`/`batchNumber`/`countryID`/`issuedBy`/`issuedOn`/`effectiveFrom`/`expiresOn` (+`regNumber` alias), with the `standardDocTypesByID`/`DocTypeStandardFields` per-doc-type schema (passport/driving_license: number+validTill required; marriage_cert: number+issuedOn, exclude validTill, Members max 2). No field dropped; an asset with no extra stays valid.
 
@@ -44,7 +44,7 @@ Relocate the legacy typed-extra DTOs into `assetus/frontend/libs/ext-assetus/src
 
 **Verifies:** assetus-frontend-port#ac:relationships-frontend-preserved
 **Depends-On:** 2
-**Status:** pending
+**Status:** in-progress
 
 Adapt the legacy relationship DTOs onto the unified frontend record, mirroring the backend `WithAssetRelationships` (`backend/dbo4assetus/relationships.go`, REQ:backend-wire-contract): the group linkage `groupID` (string) + group sub-entity `group`=`AssetGroupInfo` (`id`/`title`/`order`/`desc`/`categoryID`/`numberOf`=`{assets}`/`totals`) and its `AssetGroup` uimodel (`sneat-libs/.../core/src/lib/uimodels/asset-group.ts`); parent/sub-asset nesting `parentAssetID`+`subAssets` with per-sub-asset `SubAssetInfo` (`id`/`title`/`type`/`countryID`/`subType`/`expires`); asset linking `sameAssetID`/`relatedAs`; multi-space association alongside the canonical owning Space; and `memberIDs` (string[]) + `membersInfo` (`{id,title}[]`). Use the exact backend json names (capital-ID `groupID`/`categoryID`/`countryID`; `group` is an object, not a `groupId` string). Relocate into `assetus/frontend/libs/ext-assetus/src/lib/dto/` (+ a `uimodels`/`contexts` home as needed) and export from `dto/index.ts`/`index.ts`.
 
