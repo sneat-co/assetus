@@ -20,5 +20,5 @@ func httpPostRemoveAsset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = removeAsset(ctx, request)
-	apicore.ReturnJSON(ctx, w, r, http.StatusOK, err, nil)
+	apicore.ReturnJSON(ctx, w, r, http.StatusNoContent, err, nil)
 }

@@ -187,29 +187,68 @@ func TestHttpPostCreateAsset_returns401WhenUnauthenticated(t *testing.T) {
 // httpGetAsset
 // =============================================================================
 
-// NOTE: httpGetAsset is registered as a GET endpoint but verifies/decodes the
-// request with apicore.VerifyAuthenticatedRequestAndDecodeBody. In
-// sneat-go-core v0.55.4, apicore.DecodeRequestBody only supports POST/PUT/DELETE
-// and returns 405 Method Not Allowed for GET. The facade (getAsset) is
-// therefore never reached for a GET request — a genuine production defect: the
-// endpoint can never return a successful asset read over its registered method.
-// We assert the real 405 behaviour to document the defect; the query-param
-// parsing above the verify call is still executed for coverage.
-func TestHttpGetAsset_returns405BecauseDecodeRejectsGetMethod(t *testing.T) {
+// httpGetAsset reads its input from the query string and authenticates via
+// apicore.VerifyRequestAndCreateUserContext (no body decode), so a GET with
+// valid query params + auth reaches the facade and returns 200 with the JSON
+// asset.
+func TestHttpGetAsset_returns200WithAssetOnSuccess(t *testing.T) {
 	authAsUser(t)
 	old := getAsset
 	t.Cleanup(func() { getAsset = old })
+	var gotRequest dto4assetus.GetAssetRequest
 	getAsset = func(ctx facade.ContextWithUser, request dto4assetus.GetAssetRequest) (dto4assetus.GetAssetResponse, error) {
-		t.Fatalf("facade must not be reached: GET is rejected by DecodeRequestBody")
-		return dto4assetus.GetAssetResponse{}, nil
+		gotRequest = request
+		return dto4assetus.GetAssetResponse{ID: "a-42"}, nil
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/assetus/asset?spaceID=s-7&assetID=a-42", nil)
 	w := httptest.NewRecorder()
 	httpGetAsset(w, req)
 
-	if w.Code != http.StatusMethodNotAllowed {
-		t.Fatalf("status = %d, want 405; body=%s", w.Code, w.Body.String())
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), "a-42") {
+		t.Errorf("body %q does not contain asset id", w.Body.String())
+	}
+	if gotRequest.AssetID != "a-42" || string(gotRequest.SpaceID) != "s-7" {
+		t.Errorf("facade received request %+v, want assetID=a-42 spaceID=s-7", gotRequest)
+	}
+}
+
+func TestHttpGetAsset_returns500WhenFacadeFails(t *testing.T) {
+	authAsUser(t)
+	old := getAsset
+	t.Cleanup(func() { getAsset = old })
+	getAsset = func(ctx facade.ContextWithUser, request dto4assetus.GetAssetRequest) (dto4assetus.GetAssetResponse, error) {
+		return dto4assetus.GetAssetResponse{}, errBoom
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v0/assetus/asset?spaceID=s-7&assetID=a-42", nil)
+	w := httptest.NewRecorder()
+	httpGetAsset(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Fatalf("status = %d, want 500; body=%s", w.Code, w.Body.String())
+	}
+}
+
+func TestHttpGetAsset_returns400WhenQueryParamsMissing(t *testing.T) {
+	authAsUser(t)
+	old := getAsset
+	t.Cleanup(func() { getAsset = old })
+	getAsset = func(ctx facade.ContextWithUser, request dto4assetus.GetAssetRequest) (dto4assetus.GetAssetResponse, error) {
+		t.Fatalf("facade must not be reached when request validation fails")
+		return dto4assetus.GetAssetResponse{}, nil
+	}
+
+	// Missing assetID fails GetAssetRequest.Validate().
+	req := httptest.NewRequest(http.MethodGet, "/v0/assetus/asset?spaceID=s-7", nil)
+	w := httptest.NewRecorder()
+	httpGetAsset(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want 400; body=%s", w.Code, w.Body.String())
 	}
 }
 
@@ -276,15 +315,12 @@ func TestHttpPostUpdateAsset_returns400WhenBodyIsInvalidJSON(t *testing.T) {
 // =============================================================================
 // httpPostRemoveAsset
 //
-// NOTE: the success path calls apicore.ReturnJSON(..., http.StatusOK, nil, nil).
-// In sneat-go-core v0.55.4 ReturnJSON panics when response is nil and the
-// status is StatusOK ("expected to be http.StatusNoContent=204"). The handler
-// therefore cannot return a successful response without panicking — a genuine
-// production defect surfaced by these tests. We assert the panic to both
-// document the defect and exercise the success branch for coverage.
+// The success path returns http.StatusNoContent (204) with a nil body, which is
+// the ReturnJSON contract for a response with no payload (create/update/transfer
+// return a body; remove has none).
 // =============================================================================
 
-func TestHttpPostRemoveAsset_successPathPanicsDueToNilResponseWithStatusOK(t *testing.T) {
+func TestHttpPostRemoveAsset_returns204OnSuccess(t *testing.T) {
 	authAsUser(t)
 	old := removeAsset
 	t.Cleanup(func() { removeAsset = old })
@@ -292,19 +328,15 @@ func TestHttpPostRemoveAsset_successPathPanicsDueToNilResponseWithStatusOK(t *te
 		return nil
 	}
 
-	defer func() {
-		r := recover()
-		if r == nil {
-			t.Fatalf("expected panic from ReturnJSON(StatusOK, nil response), got none")
-		}
-		if !strings.Contains(strings.ToLower(asString(r)), "statusok") &&
-			!strings.Contains(asString(r), "204") {
-			t.Errorf("unexpected panic value: %v", r)
-		}
-	}()
-
 	w := httptest.NewRecorder()
 	httpPostRemoveAsset(w, newPostRequest("/v0/assetus/remove_asset", validRemoveAssetJSON))
+
+	if w.Code != http.StatusNoContent {
+		t.Fatalf("status = %d, want 204; body=%s", w.Code, w.Body.String())
+	}
+	if w.Body.Len() != 0 {
+		t.Errorf("expected empty body for 204, got %q", w.Body.String())
+	}
 }
 
 func TestHttpPostRemoveAsset_returns500WhenFacadeFails(t *testing.T) {
@@ -439,24 +471,71 @@ func TestHttpPostRecordHistoryEvent_returns400WhenBodyIsInvalidJSON(t *testing.T
 // httpGetHistory
 // =============================================================================
 
-// NOTE: same GET-vs-DecodeRequestBody defect as httpGetAsset — DecodeRequestBody
-// returns 405 for GET, so getHistory is never reached over the registered GET
-// method. We assert the real 405 behaviour.
-func TestHttpGetHistory_returns405BecauseDecodeRejectsGetMethod(t *testing.T) {
+// httpGetHistory reads its input from the query string and authenticates via
+// apicore.VerifyRequestAndCreateUserContext (no body decode), so a GET with
+// valid query params + auth reaches the facade and returns 200 with the JSON
+// history.
+func TestHttpGetHistory_returns200WithHistoryOnSuccess(t *testing.T) {
 	authAsUser(t)
 	old := getHistory
 	t.Cleanup(func() { getHistory = old })
+	var gotRequest dto4assetus.GetHistoryRequest
 	getHistory = func(ctx facade.ContextWithUser, request dto4assetus.GetHistoryRequest) (dto4assetus.GetHistoryResponse, error) {
-		t.Fatalf("facade must not be reached: GET is rejected by DecodeRequestBody")
-		return dto4assetus.GetHistoryResponse{}, nil
+		gotRequest = request
+		return dto4assetus.GetHistoryResponse{
+			AssetID: "a-9",
+			Events:  []dto4assetus.HistoryEventItem{{ID: "ev-1"}},
+		}, nil
 	}
 
 	req := httptest.NewRequest(http.MethodGet, "/v0/assetus/asset_history?spaceID=s-3&assetID=a-9", nil)
 	w := httptest.NewRecorder()
 	httpGetHistory(w, req)
 
-	if w.Code != http.StatusMethodNotAllowed {
-		t.Fatalf("status = %d, want 405; body=%s", w.Code, w.Body.String())
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), "ev-1") {
+		t.Errorf("body %q does not contain history event id", w.Body.String())
+	}
+	if gotRequest.AssetID != "a-9" || string(gotRequest.SpaceID) != "s-3" {
+		t.Errorf("facade received request %+v, want assetID=a-9 spaceID=s-3", gotRequest)
+	}
+}
+
+func TestHttpGetHistory_returns500WhenFacadeFails(t *testing.T) {
+	authAsUser(t)
+	old := getHistory
+	t.Cleanup(func() { getHistory = old })
+	getHistory = func(ctx facade.ContextWithUser, request dto4assetus.GetHistoryRequest) (dto4assetus.GetHistoryResponse, error) {
+		return dto4assetus.GetHistoryResponse{}, errBoom
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/v0/assetus/asset_history?spaceID=s-3&assetID=a-9", nil)
+	w := httptest.NewRecorder()
+	httpGetHistory(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Fatalf("status = %d, want 500; body=%s", w.Code, w.Body.String())
+	}
+}
+
+func TestHttpGetHistory_returns400WhenQueryParamsMissing(t *testing.T) {
+	authAsUser(t)
+	old := getHistory
+	t.Cleanup(func() { getHistory = old })
+	getHistory = func(ctx facade.ContextWithUser, request dto4assetus.GetHistoryRequest) (dto4assetus.GetHistoryResponse, error) {
+		t.Fatalf("facade must not be reached when request validation fails")
+		return dto4assetus.GetHistoryResponse{}, nil
+	}
+
+	// Missing assetID fails GetHistoryRequest.Validate().
+	req := httptest.NewRequest(http.MethodGet, "/v0/assetus/asset_history?spaceID=s-3", nil)
+	w := httptest.NewRecorder()
+	httpGetHistory(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want 400; body=%s", w.Code, w.Body.String())
 	}
 }
 
@@ -519,14 +598,4 @@ func TestHttpPostCreateVehicleRecord_returns400WhenBodyIsInvalidJSON(t *testing.
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("status = %d, want 400; body=%s", w.Code, w.Body.String())
 	}
-}
-
-func asString(v any) string {
-	if s, ok := v.(string); ok {
-		return s
-	}
-	if e, ok := v.(error); ok {
-		return e.Error()
-	}
-	return ""
 }
