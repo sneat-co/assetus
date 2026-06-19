@@ -202,6 +202,23 @@ export interface IAssetGroupInfo extends ITitledRecord {
   totals?: IMoney[];
 }
 
+// --- Multi-space association (mirror backend WithAssetSpaces) ---
+
+// IAssetusSpaceBrief mirrors the backend AssetusSpaceBrief ({assets}): the
+// per-space projection of an asset's briefs (backend AssetBriefs:
+// map[assetID]*AssetBrief).
+export interface IAssetusSpaceBrief {
+  assets?: Record<string, IAssetBrief>;
+}
+
+// IWithAssetSpaces mirrors the backend WithAssetSpaces ({spaces}): the
+// multi-space association mapping spaceID -> per-space asset briefs, so a single
+// asset record can be associated with multiple spaces. This is ADDITIVE to the
+// single owning space carried via IWithSpaceIDs.spaceIDs.
+export interface IWithAssetSpaces {
+  spaces?: Record<string, IAssetusSpaceBrief>;
+}
+
 // --- Financial / liability sub-entities ---
 
 // IAssetLiabilityInfo mirrors the backend AssetLiabilityInfo ({id,serviceTypes}).
@@ -221,7 +238,7 @@ export interface IAssetBrief {
   visibility: AssetVisibility;
 }
 
-export interface IAssetDbo extends IAssetBrief, IWithSpaceIDs {
+export interface IAssetDbo extends IAssetBrief, IWithSpaceIDs, IWithAssetSpaces {
   description?: string;
   acquisitionDate?: string; // ISO date
   purchasePrice?: IMoney;
@@ -263,7 +280,9 @@ export interface IAssetDbo extends IAssetBrief, IWithSpaceIDs {
   parentAssetID?: string;
   subAssets?: ISubAssetInfo[];
   sameAssetID?: string;
-  relatedAs?: Record<string, unknown>;
+  // relatedAs mirrors the backend dbmodels.WithOptionalRelatedAs.RelatedAs — a
+  // plain optional string naming the relationship role (json 'relatedAs').
+  relatedAs?: string;
   memberIDs?: string[];
   membersInfo?: ITitledRecord[];
 }

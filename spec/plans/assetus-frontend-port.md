@@ -44,7 +44,7 @@ Relocate the legacy typed-extra DTOs into `assetus/frontend/libs/ext-assetus/src
 
 **Verifies:** assetus-frontend-port#ac:relationships-frontend-preserved
 **Depends-On:** 2
-**Status:** in-progress
+**Status:** done
 
 Adapt the legacy relationship DTOs onto the unified frontend record, mirroring the backend `WithAssetRelationships` (`backend/dbo4assetus/relationships.go`, REQ:backend-wire-contract): the group linkage `groupID` (string) + group sub-entity `group`=`AssetGroupInfo` (`id`/`title`/`order`/`desc`/`categoryID`/`numberOf`=`{assets}`/`totals`) and its `AssetGroup` uimodel (`sneat-libs/.../core/src/lib/uimodels/asset-group.ts`); parent/sub-asset nesting `parentAssetID`+`subAssets` with per-sub-asset `SubAssetInfo` (`id`/`title`/`type`/`countryID`/`subType`/`expires`); asset linking `sameAssetID`/`relatedAs`; multi-space association alongside the canonical owning Space; and `memberIDs` (string[]) + `membersInfo` (`{id,title}[]`). Use the exact backend json names (capital-ID `groupID`/`categoryID`/`countryID`; `group` is an object, not a `groupId` string). Relocate into `assetus/frontend/libs/ext-assetus/src/lib/dto/` (+ a `uimodels`/`contexts` home as needed) and export from `dto/index.ts`/`index.ts`.
 
@@ -52,7 +52,7 @@ Adapt the legacy relationship DTOs onto the unified frontend record, mirroring t
 
 **Verifies:** assetus-frontend-port#ac:services-frontend-ported
 **Depends-On:** 3
-**Status:** pending
+**Status:** in-progress
 
 Merge the legacy frontend services (`sneat-libs/.../components/src/lib/services/{asset-service.dto.ts,asset-service.ts,assetus-space.service.ts,assetus-services.module.ts}`) into `assetus/frontend/libs/ext-assetus/src/lib/services/`, adapting onto the existing MVP `asset.service.ts`/`interfaces.ts`/`assetus-core-services.module.ts` so one asset service exposes both the MVP ownership operations and the ported create/update/add-vehicle-record operations. Wire the methods to the **actual implemented routes** (`backend/api4assetus/routes.go`, REQ:backend-wire-contract): the MVP service already covers `create_asset`/`asset`/`update_asset`/`remove_asset`/`transfer_asset`/`record_history_event`/`asset_history`; ADD the add-vehicle-record method pointing at `create_vehicle_record` (NOT `add_vehicle_record`). Mirror the current backend request surface: `ICreateAssetRequest`/`IUpdateAssetRequest` stay the flat MVP set (create takes no `status`), `IAddVehicleRecordRequest` carries the fuel-bearing payload (`fuelVolume`/`fuelVolumeUnit`/`fuelCost`/`currency`/`mileage`/`mileageUnit`). Carry the assetus space service; reconcile, do not duplicate. (See the create/update request-surface divergence note in the Feature's Open Questions.)
 

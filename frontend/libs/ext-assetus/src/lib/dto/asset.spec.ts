@@ -110,7 +110,7 @@ describe('IAssetDbo superset', () => {
         },
       ],
       sameAssetID: 'same1',
-      relatedAs: { tenant: 'r1' },
+      relatedAs: 'tenant',
       memberIDs: ['m1', 'm2'],
       membersInfo: [{ id: 'm1', title: 'Member' }],
     };
