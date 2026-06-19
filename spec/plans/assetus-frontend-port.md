@@ -1,10 +1,10 @@
 ---
 format: https://specscore.md/plan-specification
-status: Approved
+status: Executing
 ---
 # Plan: Assetus Frontend Port — Port Plan
 
-**Status:** Approved
+**Status:** Executing
 **Source Feature:** assetus-frontend-port
 **Date:** 2026-06-19
 **Owner:** alex
@@ -28,7 +28,7 @@ Backend contract anchors (from REQ:backend-wire-contract): `AssetBase`/`AssetDbo
 
 **Verifies:** assetus-frontend-port#ac:dto-superset-roundtrip, assetus-frontend-port#ac:enum-union-no-value-dropped
 **Depends-On:** —
-**Status:** pending
+**Status:** done
 
 Relocate the legacy enums (`sneat-libs/.../core/src/lib/dto/assetus-types.ts`) and the legacy `IAssetBrief`/`IAssetDbo`/`AssetLiabilityInfo` fields (`sneat-libs/.../core/src/lib/dto/dto-asset.ts`) into the MVP `assetus/frontend/libs/ext-assetus/src/lib/dto/asset.ts`, reconciling onto the MVP enums/fields already there and mirroring the **backend** json names + enum values (REQ:backend-wire-contract; `backend/dbo4assetus/asset_dbo.go`, `backend/const4assetus/`). Match `AssetCategory` to the backend `Category` set (`books`,`games`,`toys`,`sports_equipment`,`tools`,`electronics`,`clothing`,`vehicles`,`camping_equipment`,`other`,`dwelling`,`document`,`debt` — reconciliation already baked in), `AssetStatus` to `draft`/`active`/`transferred`/`archived`/`disposed`/`lost`, `AssetPossession` to `unknown`/`undisclosed`/`owning`/`leasing`/`renting`, `AssetType` to the per-category `Type` subtypes; keep `AssetCondition`/`AssetVisibility` unchanged; type fuel-volume unit / mileage unit / currency as open strings (no backend enum). Add the optional record fields with the **exact backend json names** (`isRequest`/`countryID`/`type`/`AssetDates` (`dateOfBuild`/`dateOfPurchase`/`dateInsuredTill`/`dateCertifiedTill`)/`yearOfBuild`/`possession`/`parentAssetID`/`parentCategoryID`/`geo`/`photos`/`memberIDs`/`membersInfo`/`groupID`+`group`/`subAssets`/`sameAssetID`/`relatedAs`/custom fields/`extraType`/`extra`/`totals`/`canHaveIncome`/`canHaveExpense`/`financialDirection`/`liabilities`/`notUsedServiceTypes`) as **optional** so a minimal MVP asset stays valid. Note the draft-vs-real corrections: `groupID` (not `groupId`) + `group` object, `categoryID`/`countryID` capital-ID, and there is no separate `title`/`desc` (`name` is canonical).
 
@@ -36,7 +36,7 @@ Relocate the legacy enums (`sneat-libs/.../core/src/lib/dto/assetus-types.ts`) a
 
 **Verifies:** assetus-frontend-port#ac:vehicle-extra-frontend-no-field-dropped, assetus-frontend-port#ac:document-extra-frontend-full-shape
 **Depends-On:** 1
-**Status:** pending
+**Status:** in-progress
 
 Relocate the legacy typed-extra DTOs into `assetus/frontend/libs/ext-assetus/src/lib/dto/`, resolved by `extraType` ∈ {`vehicle`,`dwelling`,`document`}, mirroring the backend `extras4assetus` shapes (REQ:backend-wire-contract). Vehicle (`backend/extras4assetus/asset_vehicle.go`+`with_engine_data.go`+`with_make_model.go`): `make`/`model`/`regNumber`/`vin`, engine `engineType`/`engineFuel`/`engineCC`/`engineKW`/`engineNM`/`engineSerialNumber`, plain due-dates `nctExpires`/`taxExpires`/`nextServiceDue` (no task-link IDs on the backend — port plain dates). Vehicle record: both the persisted `VehicleRecordDbo{fuel:{volume,unit,amount,fuelCost,currency},mileage:{value,unit}}` (`backend/dbo4assetus/vehicle_record_dbo.go`) and the flat append request `AddVehicleRecordRequest{fuelVolume,fuelVolumeUnit,fuelCost,currency,mileage,mileageUnit}` (`backend/dto4assetus/add_vehicle_record.go`) — units/currency as plain strings. Dwelling (`backend/extras4assetus/asset_dwelling.go`): `address`/`rent_price`(`{value,currency}`)/`numberOfBedrooms`/`areaSqM`. Document (`backend/extras4assetus/asset_document.go`+`doc_type_schema.go`): `docType` (`passport`/`id_card`/`driving_license`/`marriage_cert`/`birth_cert`)/`number`/`batchNumber`/`countryID`/`issuedBy`/`issuedOn`/`effectiveFrom`/`expiresOn` (+`regNumber` alias), with the `standardDocTypesByID`/`DocTypeStandardFields` per-doc-type schema (passport/driving_license: number+validTill required; marriage_cert: number+issuedOn, exclude validTill, Members max 2). No field dropped; an asset with no extra stays valid.
 
