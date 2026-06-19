@@ -1,10 +1,10 @@
 ---
 format: https://specscore.md/plan-specification
-status: Approved
+status: Executing
 ---
 # Plan: Unified Assetus Data Model — Port Plan
 
-**Status:** Approved
+**Status:** Executing
 **Source Feature:** unified-assetus-data-model
 **Date:** 2026-06-19
 **Owner:** alex
@@ -26,7 +26,7 @@ Legacy source root: `sneat-go-backend/pkg/extensions/assetus/`. MVP merge target
 
 **Verifies:** unified-assetus-data-model#ac:category-superset, unified-assetus-data-model#ac:out-of-category-type-rejected, unified-assetus-data-model#ac:status-no-value-dropped
 **Depends-On:** —
-**Status:** pending
+**Status:** done
 
 Relocate legacy `const4assetus` (`AssetCategory`, `AssetStatus`, `AssetPossession`, per-category `AssetType`, `AssetDocumentType`, `EngineType`, `FuelType`, and the engine↔fuel compatibility validation) into `assetus/backend/const4assetus`, unioning with the MVP enums already there (`Condition`, `Visibility`, `Status` lifecycle states, `OwnerType`, `HistoryEventType`). Build the documented legacy→unified mapping table including `sport_gear`→`sports_equipment`, `vehicle`↔`vehicles`, `misc`→`other`, `debt` retained as a Category value, and `undefined`. Preserve per-category `Type` validation so out-of-category subtypes are rejected.
 

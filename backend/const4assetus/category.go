@@ -23,9 +23,23 @@ const (
 	CategoryVehicles         Category = "vehicles"
 	CategoryCampingEquipment Category = "camping_equipment"
 	CategoryOther            Category = "other"
+
+	// CategoryDwelling is the unified category for real estate / dwellings,
+	// ported from the legacy AssetCategoryDwelling.
+	CategoryDwelling Category = "dwelling"
+
+	// CategoryDocument is the unified category for documents, ported from the
+	// legacy AssetCategoryDocument.
+	CategoryDocument Category = "document"
+
+	// CategoryDebt is retained from the legacy model as a first-class category
+	// value (debts/liabilities tracked alongside assets).
+	CategoryDebt Category = "debt"
 )
 
-// Categories is the closed set of valid categories.
+// Categories is the closed set of valid categories. It is the union of the MVP
+// categories and the ported legacy categories (legacy sport_gear maps to
+// sports_equipment, legacy vehicle maps to vehicles, legacy misc maps to other).
 var Categories = []Category{
 	CategoryBooks,
 	CategoryGames,
@@ -37,6 +51,9 @@ var Categories = []Category{
 	CategoryVehicles,
 	CategoryCampingEquipment,
 	CategoryOther,
+	CategoryDwelling,
+	CategoryDocument,
+	CategoryDebt,
 }
 
 // IsValidCategory reports whether v is a member of the closed category set.
