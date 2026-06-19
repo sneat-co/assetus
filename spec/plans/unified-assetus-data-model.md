@@ -42,7 +42,7 @@ Adapt the legacy `AssetBrief`/`AssetBaseDbo`/`AssetDbo` (and `briefs4assetus`) f
 
 **Verifies:** unified-assetus-data-model#ac:typed-extras-optional, unified-assetus-data-model#ac:vehicle-extra-no-field-dropped, unified-assetus-data-model#ac:document-extra-full-shape
 **Depends-On:** 2
-**Status:** pending
+**Status:** done
 
 Relocate legacy `extras4assetus` onto the flat core in `assetus/backend`: `WithExtraField` registration by `extraType`; `AssetVehicleExtra` (make/model/regNumber/VIN, engine incl. `engineSerialNumber`, EngineType↔FuelType validation); the full vehicle-record child collection (`VehicleRecordDbo` = `VehicleMileage{value,unit}` + `VehicleFuelRecord{volume,unit,amount}` + `fuelCost`/`currency` + `CreatedFields`); `AssetDwellingExtra` (address/rent/bedrooms/area); `AssetDocumentExtra` full shape (`docType`/`number`/`batchNumber`/`countryID`/`issuedBy`/`issuedOn`/`effectiveFrom`/`expiresOn`) with the `standardDocTypesByID` per-doc-type validation schema. Carry over the legacy indexed-field declarations (vehicle make/model/regNumber/vin; document expiresOn/effectiveFrom) per REQ:query-index-fields. An asset with no extra stays valid.
 
