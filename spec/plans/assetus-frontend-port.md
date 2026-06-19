@@ -60,7 +60,7 @@ Merge the legacy frontend services (`sneat-libs/.../components/src/lib/services/
 
 **Verifies:** assetus-frontend-port#ac:all-components-accounted
 **Depends-On:** 4
-**Status:** in-progress
+**Status:** done
 
 Relocate every legacy component from `sneat-libs/.../components/src/lib/` into `assetus/frontend/libs/ext-assetus/src/lib/components/` (alongside `asset-history-timeline`), adapting each onto the unified DTOs/services: `vehicle-card`, `vehicle-engine`, `make-model-card`, `asset-reg-number-input`, `mileage-dialog`, `edit-dwelling-card`, `real-estate-location`, `asset-dates`, `period-segment`, `asset-possesion-card` (→ `asset-possession-card`), `asset-liabilities`, `asset-contacts-group`, `asset-add-{vehicle,dwelling,document,service}`, `assets-list`+`asset-list-item`, `asset-card`, plus the shared bases (`add-asset-base-component`, `asset-base-page`, `asset-component-base-params`) and the `car-makes-with-models`/`vehicles` data. Re-export ported components from `components/index.ts`; any component intentionally not ported gets an explicit deferral reason recorded for the coverage table (Task 7). The standalone liabilities `asset-add-service` UI may be marked for the liabilities sibling Feature.
 
@@ -68,7 +68,7 @@ Relocate every legacy component from `sneat-libs/.../components/src/lib/` into `
 
 **Verifies:** assetus-frontend-port#ac:all-pages-accounted
 **Depends-On:** 5
-**Status:** pending
+**Status:** in-progress
 
 Relocate every legacy page from `sneat-apps/.../pages/src/lib/` into `assetus/frontend/libs/ext-assetus/src/lib/pages/` and wire into `assetus-routing.ts`: `assets`, `asset`, `new-asset`, `real-estates`+`real-estate`, `asset-group`, `optimization`, the `liability/*` pages (`liability-new`, `select-service-provider`), and the shared `asset-base.page`/`assets-base.page`. Reconcile the existing MVP pages (`assets`, `asset`, `transfer`, `new-asset-dialog`) into the ported set rather than duplicating; any page intentionally not ported (e.g. the standalone liabilities pages → liabilities sibling Feature) gets an explicit deferral reason recorded for the coverage table (Task 7).
 
