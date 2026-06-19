@@ -1,10 +1,10 @@
 ---
 format: https://specscore.md/plan-specification
-status: Executing
+status: Implemented
 ---
 # Plan: Unified Assetus Data Model — Port Plan
 
-**Status:** Executing
+**Status:** Implemented
 **Source Feature:** unified-assetus-data-model
 **Date:** 2026-06-19
 **Owner:** alex
@@ -74,7 +74,7 @@ Author the capability-coverage table mapping every legacy capability in `docs/le
 
 **Verifies:** unified-assetus-data-model#ac:backend-test-coverage
 **Depends-On:** 6
-**Status:** pending
+**Status:** done
 
 Add/port unit tests so every ported capability is exercised — each unioned enum and its mapping, each optional-field round-trip, each typed extra (including the vehicle fuel-record), the relationship/multi-space/member-info structures, and the facades (create/get/update/remove/transfer/add-vehicle-record). Carry over any reusable legacy tests from `sneat-go-backend/pkg/extensions/assetus/` rather than re-authoring. Verify overall backend statement coverage is ≥80% via `go test -cover ./...` from `backend/`. (Frontend test coverage is the equivalent requirement for the separate frontend-port sibling Feature — see Open Questions.)
 
