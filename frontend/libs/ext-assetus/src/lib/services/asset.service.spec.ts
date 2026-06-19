@@ -5,12 +5,11 @@ import { SneatApiService } from '@sneat/api';
 import { of } from 'rxjs';
 import { AssetService } from './asset.service';
 
-vi.mock('@angular/fire/firestore', () => ({
-  Firestore: class {},
-  collection: vi.fn(),
-  collectionData: vi.fn(() => of([])),
-}));
-
+// The service injects the real Firestore token at construction but only touches
+// Firestore in watchAssets (not exercised here), so a bare stub value satisfies
+// `inject(Firestore)` without mocking the @angular/fire module — module mocks
+// leak across vitest workers that also use the real Firestore, making the suite
+// flaky.
 describe('AssetService', () => {
   let service: AssetService;
   let post: ReturnType<typeof vi.fn>;

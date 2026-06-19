@@ -1,10 +1,10 @@
 ---
 format: https://specscore.md/plan-specification
-status: Executing
+status: Implemented
 ---
 # Plan: Assetus Frontend Port — Port Plan
 
-**Status:** Executing
+**Status:** Implemented
 **Source Feature:** assetus-frontend-port
 **Date:** 2026-06-19
 **Owner:** alex
@@ -84,7 +84,7 @@ Author the frontend capability-coverage table mapping every legacy frontend capa
 
 **Verifies:** assetus-frontend-port#ac:frontend-test-coverage
 **Depends-On:** 7
-**Status:** in-progress
+**Status:** done
 
 Add/port unit tests so every ported DTO has a round-trip/shape test asserting the **backend json field names + enum string values** (incl. `draft`/`debt`/`dwelling`/`document` categories, `phev`/`hybrid`/`steam` engine types, `bio`/`hydrogen` fuels, the `groupID`/`categoryID`/`countryID` capital-ID names, the vehicle fuel-record extra both persisted and request shape, the document per-doc-type validation schema, the relationship DTOs) and every ported component has at least a render/smoke test. Carry over any reusable legacy specs rather than re-authoring. Verify overall statement coverage is ≥80% via `npx nx test ext-assetus --coverage --watch=false` using the workspace's vitest runner (`@analogjs/vitest-angular`, `@vitest/coverage-v8`), NOT jest.
 

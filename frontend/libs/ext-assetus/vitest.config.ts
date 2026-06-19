@@ -14,6 +14,20 @@ export default defineConfig({
     ],
   },
   test: {
+    // jsdom + the analog TestBed setup (injected by @nx/angular:unit-test) so
+    // the ported standalone Angular components/pages can be created and rendered
+    // in specs. Pure-logic specs (DTOs, services) run fine under jsdom too.
+    environment: 'jsdom',
+    environmentOptions: { jsdom: { url: 'http://localhost/' } },
+    // Ionic's icon lazy-loader tries to fetch SVGs in jsdom and throws benign
+    // async "Invalid URL" / fetch errors when components with icons render.
+    // All assertions still pass; don't let these unhandled async errors fail.
+    dangerouslyIgnoreUnhandledErrors: true,
     server: { deps: { inline: [/@ionic/, /ionicons/, /@sneat/] } },
+    deps: {
+      optimizer: {
+        web: { include: ['@ionic/angular', '@ionic/core', 'ionicons'] },
+      },
+    },
   },
 });
