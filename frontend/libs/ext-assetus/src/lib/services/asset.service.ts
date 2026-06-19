@@ -40,7 +40,7 @@ export interface IIdAndAssetDbo {
 // sneat API (the SneatApiService prefixes the v0 base URL).
 const api = (endpoint: string): string => `assetus/${endpoint}`;
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AssetService {
   private readonly afs = inject(AngularFirestore);
   private readonly sneatApiService = inject(SneatApiService);
