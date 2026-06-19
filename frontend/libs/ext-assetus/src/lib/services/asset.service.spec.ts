@@ -1,4 +1,3 @@
-import { HttpParams } from '@angular/common/http';
 import { Injector, runInInjectionContext } from '@angular/core';
 import { Firestore, Timestamp } from '@angular/fire/firestore';
 import { SneatApiService } from '@sneat/api';
@@ -165,15 +164,6 @@ describe('AssetService', () => {
     expect(sent.extraType).toBe('vehicle');
     expect(sent.extra).toEqual({ vin: 'WVWZZZ1JZXW000001' });
     expect('status' in sent).toBe(false);
-  });
-
-  it('getAsset gets asset with spaceID+assetID params', () => {
-    service.getAsset('s1', 'a1').subscribe();
-    expect(get).toHaveBeenCalledTimes(1);
-    const [endpoint, params] = get.mock.calls[0];
-    expect(endpoint).toBe('assetus/asset');
-    expect((params as HttpParams).get('spaceID')).toBe('s1');
-    expect((params as HttpParams).get('assetID')).toBe('a1');
   });
 
   it('updateAsset posts to update_asset with the request', () => {

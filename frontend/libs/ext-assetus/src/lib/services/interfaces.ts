@@ -100,10 +100,6 @@ export interface IAssetResponse {
   asset: IAssetDbo;
 }
 
-export interface IGetAssetResponse extends IAssetResponse {
-  owner: IOwner;
-}
-
 export interface IUpdateAssetRequest extends IAssetMetadata, IAssetRichFields {
   spaceID: string;
   assetID: string;
