@@ -1,4 +1,3 @@
-import { HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   Firestore as AngularFirestore,
@@ -23,7 +22,6 @@ import {
   IAssetHistoryResponse,
   IAssetResponse,
   ICreateAssetRequest,
-  IGetAssetResponse,
   IRecordHistoryEventRequest,
   IRemoveAssetRequest,
   ITransferAssetRequest,
@@ -62,14 +60,6 @@ export class AssetService {
       api('create_asset'),
       request,
     );
-  }
-
-  public getAsset(
-    spaceID: string,
-    assetID: string,
-  ): Observable<IGetAssetResponse> {
-    const params = new HttpParams({ fromObject: { spaceID, assetID } });
-    return this.sneatApiService.get<IGetAssetResponse>(api('asset'), params);
   }
 
   public updateAsset(

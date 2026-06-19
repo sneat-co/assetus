@@ -25,6 +25,7 @@ import {
   SpaceComponentBaseParams,
 } from '@sneat/space-components';
 import { ClassName } from '@sneat/ui';
+import { Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
   AssetCategory,
@@ -85,6 +86,8 @@ export class AssetPageComponent extends SpaceBaseComponent {
   protected readonly $asset = signal<IAssetDbo | undefined>(undefined);
   protected saving = false;
 
+  private assetSub?: Subscription;
+
   // Editable form fields.
   protected name = '';
   protected description = '';
@@ -105,11 +108,20 @@ export class AssetPageComponent extends SpaceBaseComponent {
     if (!assetID || !this.space?.id) {
       return;
     }
-    this.assetService
-      .getAsset(this.space.id, assetID)
+    // Live read from Firestore: re-applies the asset on every change so the page
+    // auto-refreshes (own save, transfer, external edit) — consistent with the
+    // live assets list. Re-subscribing (e.g. after transfer) replaces any prior
+    // subscription.
+    this.assetSub?.unsubscribe();
+    this.assetSub = this.assetService
+      .watchAssetByID(this.space, assetID)
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
-        next: (res) => this.applyAsset(res.asset),
+        next: (ctx) => {
+          if (ctx.dbo) {
+            this.applyAsset(ctx.dbo);
+          }
+        },
         error: this.errorLogger.logErrorHandler('Failed to load asset'),
       });
   }
