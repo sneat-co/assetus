@@ -42,6 +42,81 @@ describe('AssetService', () => {
     expect(post).toHaveBeenCalledWith('assetus/create_asset', request);
   });
 
+  it('createAsset forwards the rich superset fields (incl. vehicle extra + status=draft)', () => {
+    const request = {
+      spaceID: 's1',
+      name: 'Car',
+      category: 'vehicles' as const,
+      condition: 'good' as const,
+      visibility: 'private' as const,
+      status: 'draft' as const,
+      // rich superset fields
+      type: 'car' as const,
+      possession: 'owning' as const,
+      countryID: 'IE',
+      yearOfBuild: 2020,
+      isRequest: false,
+      geo: { lat: 53.3, lng: -6.2 },
+      dateOfPurchase: '2020-01-15',
+      totals: [{ currency: 'EUR', value: 15000 }],
+      canHaveExpense: true,
+      financialDirection: 'expense',
+      groupID: 'g1',
+      subAssets: [{ id: 'sa1', title: 'Spare', type: 'vehicles' as const }],
+      // typed extra
+      extraType: 'vehicle' as const,
+      extra: { make: 'Toyota', model: 'Corolla', regNumber: '12-D-3456' },
+    };
+    service.createAsset(request).subscribe();
+    expect(post).toHaveBeenCalledWith('assetus/create_asset', request);
+    const [, sent] = post.mock.calls[0];
+    expect(sent.extraType).toBe('vehicle');
+    expect(sent.extra).toEqual({
+      make: 'Toyota',
+      model: 'Corolla',
+      regNumber: '12-D-3456',
+    });
+    expect(sent.status).toBe('draft');
+    expect(sent.type).toBe('car');
+    expect(sent.totals).toEqual([{ currency: 'EUR', value: 15000 }]);
+  });
+
+  it('createAsset still works with only the flat MVP fields', () => {
+    const request = {
+      spaceID: 's1',
+      name: 'Book',
+      category: 'books' as const,
+      condition: 'new' as const,
+    };
+    service.createAsset(request).subscribe();
+    expect(post).toHaveBeenCalledWith('assetus/create_asset', request);
+  });
+
+  it('updateAsset forwards the rich superset fields but carries NO status', () => {
+    const request = {
+      spaceID: 's1',
+      assetID: 'a1',
+      name: 'Car',
+      category: 'vehicles' as const,
+      condition: 'good' as const,
+      visibility: 'private' as const,
+      // rich superset fields
+      type: 'car' as const,
+      possession: 'leasing' as const,
+      parentCategoryID: 'vehicles' as const,
+      liabilities: [{ id: 'l1', serviceTypes: ['insurance'] }],
+      notUsedServiceTypes: ['tax'],
+      extraType: 'vehicle' as const,
+      extra: { vin: 'WVWZZZ1JZXW000001' },
+    };
+    service.updateAsset(request).subscribe();
+    expect(post).toHaveBeenCalledWith('assetus/update_asset', request);
+    const [, sent] = post.mock.calls[0];
+    expect(sent.extraType).toBe('vehicle');
+    expect(sent.extra).toEqual({ vin: 'WVWZZZ1JZXW000001' });
+    expect('status' in sent).toBe(false);
+  });
+
   it('getAsset gets asset with spaceID+assetID params', () => {
     service.getAsset('s1', 'a1').subscribe();
     expect(get).toHaveBeenCalledTimes(1);
