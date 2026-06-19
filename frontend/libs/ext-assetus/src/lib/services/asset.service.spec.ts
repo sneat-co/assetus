@@ -185,4 +185,13 @@ describe('AssetService', () => {
     service.addVehicleRecord(request).subscribe();
     expect(post).toHaveBeenCalledWith('assetus/create_vehicle_record', request);
   });
+
+  // watchAssetByID's happy path reads Firestore (like watchAssets, deliberately
+  // not exercised here to avoid the cross-worker @angular/fire module-mock leak
+  // noted above). Its required-spaceID guard is reachable without Firestore.
+  it('watchAssetByID throws when the space has no id', () => {
+    expect(() =>
+      service.watchAssetByID({ id: '' } as never, 'a1'),
+    ).toThrowError('spaceID is required');
+  });
 });
