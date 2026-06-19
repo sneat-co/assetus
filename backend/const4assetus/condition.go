@@ -47,3 +47,15 @@ func ValidateCondition(v Condition) error {
 	}
 	return nil
 }
+
+// ValidateConditionOptional returns an error only if a non-empty condition is
+// not a member of the closed set. An empty (unset) condition is VALID. The
+// unified asset model carries condition as optional metadata: an asset ported
+// from a legacy record that never had a condition is expressed with no
+// condition and is still valid.
+func ValidateConditionOptional(v Condition) error {
+	if v == "" {
+		return nil
+	}
+	return ValidateCondition(v)
+}

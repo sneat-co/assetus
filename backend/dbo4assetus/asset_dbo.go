@@ -199,7 +199,7 @@ func (v AssetBase) Validate() error {
 	if err := const4assetus.ValidateCategory(v.Category); err != nil {
 		return err
 	}
-	if err := const4assetus.ValidateCondition(v.Condition); err != nil {
+	if err := const4assetus.ValidateConditionOptional(v.Condition); err != nil {
 		return err
 	}
 	if err := const4assetus.ValidateStatus(v.Status); err != nil {
@@ -317,7 +317,7 @@ func (v AssetBrief) Validate() error {
 	if err := const4assetus.ValidateCategory(v.Category); err != nil {
 		return err
 	}
-	if err := const4assetus.ValidateCondition(v.Condition); err != nil {
+	if err := const4assetus.ValidateConditionOptional(v.Condition); err != nil {
 		return err
 	}
 	if err := const4assetus.ValidateStatus(v.Status); err != nil {

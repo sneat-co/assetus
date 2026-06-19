@@ -16,4 +16,5 @@ func RegisterHttpRoutes(handle extension.HTTPHandleFunc) {
 	handle(http.MethodPost, "/v0/assetus/transfer_asset", httpPostTransferAsset)
 	handle(http.MethodPost, "/v0/assetus/record_history_event", httpPostRecordHistoryEvent)
 	handle(http.MethodGet, "/v0/assetus/asset_history", httpGetHistory)
+	handle(http.MethodPost, "/v0/assetus/create_vehicle_record", httpPostCreateVehicleRecord)
 }

@@ -51,6 +51,42 @@ func TestCreateAsset_MemberCreates(t *testing.T) {
 	}
 }
 
+// AC: condition-optional-visibility-default — a legacy asset that carries no
+// condition, created in a Space whose default visibility is family, with no
+// condition and no visibility supplied: condition remains unset (valid) and
+// visibility resolves to family (the owning Space default).
+func TestCreateAsset_ConditionOptionalVisibilityDefault(t *testing.T) {
+	const spaceID coretypes.SpaceID = "family1"
+	db := newTestDBWithSpace(t, spaceID, coretypes.SpaceTypeFamily, testUserID)
+
+	resp, err := CreateAsset(userCtx(testUserID), dto4assetus.CreateAssetRequest{
+		SpaceRequest: spaceRequest(spaceID),
+		Name:         "Legacy Item Without Condition",
+		Category:     const4assetus.CategoryOther,
+		// No Condition and no Visibility supplied.
+	})
+	if err != nil {
+		t.Fatalf("CreateAsset failed: %v", err)
+	}
+	if resp.Asset.Condition != "" {
+		t.Errorf("condition = %q, want unset", resp.Asset.Condition)
+	}
+	if resp.Asset.Visibility != const4assetus.VisibilityFamily {
+		t.Errorf("visibility = %q, want family (Space default)", resp.Asset.Visibility)
+	}
+	// Re-read the persisted record to confirm it round-trips as valid.
+	asset := dal4assetus.NewAssetEntry(spaceID, resp.ID)
+	if err = db.Get(context.Background(), asset.Record); err != nil {
+		t.Fatalf("failed to read created asset: %v", err)
+	}
+	if asset.Data.Condition != "" {
+		t.Errorf("persisted condition = %q, want unset", asset.Data.Condition)
+	}
+	if asset.Data.Visibility != const4assetus.VisibilityFamily {
+		t.Errorf("persisted visibility = %q, want family", asset.Data.Visibility)
+	}
+}
+
 // AC: non-member-cannot-create — a non-member is rejected and no record persists.
 func TestCreateAsset_NonMemberRejected(t *testing.T) {
 	const spaceID coretypes.SpaceID = "family1"

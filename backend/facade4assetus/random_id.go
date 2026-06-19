@@ -16,3 +16,8 @@ func newAssetID() string {
 func newHistoryEventID() string {
 	return random.ID(assetIDLength)
 }
+
+// newVehicleRecordID generates a random vehicle-record ID.
+func newVehicleRecordID() string {
+	return random.ID(assetIDLength)
+}

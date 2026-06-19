@@ -58,7 +58,7 @@ Adapt the legacy relationship structures onto the unified record: `WithAssetSpac
 
 **Verifies:** unified-assetus-data-model#ac:history-transfer-intact, unified-assetus-data-model#ac:condition-optional-visibility-default
 **Depends-On:** 4
-**Status:** pending
+**Status:** done
 
 Merge the legacy facades/routes (`CreateAsset`/`GetAsset`/`UpdateAsset`/`DeleteAsset`/`AddVehicleRecord` + HTTP endpoints) into the MVP `facade4assetus`/`api4assetus`, keeping the MVP ownership core intact: append-only history, Space→Space transfer (relocates asset + history, appends `Transferred`), owner-type derivation, soft-archive-vs-hard-delete, and create-time visibility defaulting to the owning Space's default. Adapt `AddVehicleRecord` to the fuel-bearing request payload (`fuelVolume`/`fuelVolumeUnit`/`fuelCost`/`currency`/`mileage`/`mileageUnit`) and reconcile the `dal4assetus` paths/child collections.
 
