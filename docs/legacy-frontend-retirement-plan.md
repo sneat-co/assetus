@@ -1,81 +1,126 @@
-# Legacy Frontend Assetus — Retirement Plan (handoff for a fresh session)
+# Legacy Frontend Assetus — Retirement Plan (multi-agent handoff)
 
-**Status:** Ready to execute · **Owner decision pending per step** · Tracks GitHub issue sneat-co/assetus#4
-**Goal:** Migrate every consumer of the **legacy** frontend assetus packages onto the **new** unified `@sneat/extension-assetus` lib, then **delete** the legacy frontend assetus code — with zero functionality lost.
+**Status:** Ready to execute · Tracks GitHub issue sneat-co/assetus#4
+**Goal:** Migrate every consumer of the **legacy** frontend assetus packages onto the **new** unified `@sneat/extension-assetus` lib, then **delete** the legacy frontend assetus code — zero functionality lost.
 
-> **Backend is already done.** The legacy backend (`sneat-go-backend/pkg/extensions/assetus`) was deleted in sneat-go-backend#194; the monolith runs on the published standalone module `github.com/sneat-co/assetus/backend v0.1.0` via `assetusext.Extension()`. This plan is **frontend only**.
+> **Backend is already done.** Legacy backend (`sneat-go-backend/pkg/extensions/assetus`) deleted in sneat-go-backend#194; monolith runs on published `github.com/sneat-co/assetus/backend v0.1.0` via `assetusext.Extension()`. **This plan is frontend only.**
 
 ---
 
-## 1. What "legacy frontend assetus" is
+## 1. Execution model (read first)
 
-Two published libraries that live in **`sneat-libs/libs/extensions/assetus/`**:
+This is a **pipeline with barriers**, not a flat fan-out. There is a serial gate at the front and a serial barrier at the end; only the middle parallelizes.
+
+```
+PHASE 1  (SERIAL, blocking) ── single agent ──────────────────────────────
+   Port the new lib's missing exports + PUBLISH @sneat/extension-assetus.
+   Nothing downstream can start until the new lib exposes the needed
+   symbols AND is published/consumable by sneat-apps + sneat-libs.
+        │
+        ▼
+PHASE 2  (PARALLEL fan-out) ── 3 agents, one per repo ───────────────────
+   A: assetus     — self-decouple ext-assetus (issue #4)
+   B: sneat-libs  — contactus/shared + contactus/internal
+   C: sneat-apps  — docus + budgetus
+   Streams are independent (separate repos / nx workspaces). Within a
+   stream, consumers run sequentially to avoid intra-workspace nx-cache
+   contention. Each stream ends with its own green build + PR.
+        │
+        ▼
+PHASE 3  (SERIAL barrier) ── single agent ───────────────────────────────
+   Confirm zero remaining importers → delete legacy dirs → full build →
+   deletion PRs → close #4.
+```
+
+**Why by repo, not by consumer:** two agents running `nx build/test` in the *same* workspace contend on the nx cache/daemon. Repos are separate nx workspaces, so the safe parallel unit is the repo. `docus`+`budgetus` share the sneat-apps workspace → one agent does both, sequentially.
+
+**Why Phase 1 can't be parallelized in:** every consumer migration repoints imports to `@sneat/extension-assetus`; that target must already export the symbols and be installable. So publish is a hard prerequisite barrier.
+
+**Workflow shape (if driven via the Workflow tool):**
+`phase('publish') → agent(A1)` then `phase('migrate') → parallel([B, C])` (A's self-decouple can run in the publish phase or as a third parallel stream once exports exist) `→ phase('delete') → agent(barrier)`.
+
+---
+
+## 2. What "legacy frontend assetus" is
+
+Two published libraries in **`sneat-libs/libs/extensions/assetus/`**:
 
 | Package | Path | Contents |
 |---|---|---|
-| `@sneat/mod-assetus-core` | `sneat-libs/libs/extensions/assetus/core` | DTOs, enums, UI context wrappers, reference data (`carMakes`), `uimodels` (`AssetGroup`) |
-| `@sneat/ext-assetus-components` | `sneat-libs/libs/extensions/assetus/components` | `AssetService`, the ~19 Angular components, shared bases |
+| `@sneat/mod-assetus-core` | `…/assetus/core` | DTOs, enums, UI context wrappers, `carMakes` data, `uimodels` (`AssetGroup`) |
+| `@sneat/ext-assetus-components` | `…/assetus/components` | `AssetService`, ~19 Angular components, shared bases |
 
 Plus legacy **pages** in `sneat-apps/libs/extensions/assetus/pages/`.
+The **new** replacement is **`@sneat/extension-assetus`** at `assetus/frontend/libs/ext-assetus`.
 
-The **new** replacement is **`@sneat/extension-assetus`** at `assetus/frontend/libs/ext-assetus` (the superset port from sneat-co/assetus#3).
+## 3. The 5 consumers (the blast radius) — exact symbols
 
-## 2. Why it can't be deleted yet — the 5 consumers
+| Stream | Consumer | Repo | Imports | Symbols |
+|---|---|---|---|---|
+| A | **ext-assetus** (new lib) | assetus | core ×17, components ×24 | `IAssetContext`, `IAssetDwellingContext`, `IAssetDocumentContext`, `IAssetBrief`, `AssetCategory`, `AssetType`, `IAssetDtoGroup`, `carMakes`/`IMake`/`IModel`, `AssetService`, legacy `IUpdateAssetRequest`, base components |
+| B | **contactus/shared** | sneat-libs | core ×1, components ×2 | `IAssetContext`, `AssetService` |
+| B | **contactus/internal** | sneat-libs | core ×1 | `IAssetContext` |
+| C | **docus** | sneat-apps | core ×5, components ×7 | `IAssetDocumentContext`, `AssetService` |
+| C | **budgetus** | sneat-apps | core ×1 | `AssetGroup` |
 
-Deleting the legacy packages now breaks the build of every importer below. Exact symbols each one uses:
+Only A is from the unification (#4); B and C are pre-existing, independent.
 
-| Consumer | Repo | Imports from legacy | Symbols used |
-|---|---|---|---|
-| **ext-assetus** (the NEW lib) | assetus | `mod-assetus-core` (17 files), `ext-assetus-components` (24 files) | `IAssetContext`, `IAssetDwellingContext`, `IAssetDocumentContext`, `IAssetBrief`, `AssetCategory`, `AssetType`, `IAssetDtoGroup`, `carMakes`/`IMake`/`IModel`, `AssetService`, legacy `IUpdateAssetRequest`, shared base components |
-| **docus** | sneat-apps | `mod-assetus-core` (5), `ext-assetus-components` (7) | `IAssetDocumentContext`, `AssetService` |
-| **budgetus** | sneat-apps | `mod-assetus-core` (1) | `AssetGroup` |
-| **contactus/shared** | sneat-libs | `mod-assetus-core` (1), `ext-assetus-components` (2) | `IAssetContext`, `AssetService` |
-| **contactus/internal** | sneat-libs | `mod-assetus-core` (1) | `IAssetContext` |
+## 4. PHASE 1 — Port exports + publish (SERIAL prerequisite)
 
-Only **ext-assetus** is from the unification (issue #4). The other four are **pre-existing, independent** dependencies — that is the real blast radius.
+Audit `@sneat/extension-assetus`'s public `index.ts`; add/port every symbol §3 lists. Known gaps to port from legacy `core`:
+- **Context wrappers** `IAssetContext` / `IAssetDocumentContext` / `IAssetDwellingContext` (`core/src/lib/contexts/`) — UI glue wrapping DTO + space context.
+- **`carMakes` / `IMake` / `IModel`** (`core/src/lib/data/car-makes-with-models.ts`).
+- **`AssetGroup`** uimodel (`core/src/lib/uimodels/asset-group.ts`) — reconcile with new `IAssetGroupInfo`.
+- **`AssetService`** — new lib already has its own (8 routes, widened DTOs); confirm method/DTO parity with the legacy service docus/contactus used.
+- Enums/DTOs (`AssetCategory`, `AssetType`, `IAssetBrief`) — present; confirm names match.
 
-## 3. Prerequisite — the new lib must export the needed surface
+Gate: `nx run-many -t lint test build --projects=ext-assetus` green, then **publish** a new `@sneat/extension-assetus` version (same release mechanism as other `@sneat/extension-*` libs) so sneat-apps + sneat-libs can install it.
 
-Before any external consumer can migrate, `@sneat/extension-assetus` must (a) **export** every symbol the consumers need and (b) be **publishable/consumable** by sneat-apps + sneat-libs (it must be published to the registry the same way `@sneat/extension-listus`/others are, or wired via the workspace).
+## 5. PHASE 2 — Per-repo migration (PARALLEL, 3 agents)
 
-Audit the new lib's public `index.ts` and add/port whatever is missing. Known gaps to port from legacy `core`:
-- **UI context wrappers**: `IAssetContext`, `IAssetDocumentContext`, `IAssetDwellingContext` (legacy `core/src/lib/contexts/`). The new lib has the DTOs but may not have these `*Context` wrappers — port them.
-- **Reference data**: `carMakes`, `IMake`, `IModel` (legacy `core/src/lib/data/car-makes-with-models.ts`). Port into the new lib.
-- **`AssetGroup`** uimodel (legacy `core/src/lib/uimodels/asset-group.ts`) — reconcile with the new `IAssetGroupInfo`.
-- **`AssetService`** — the new lib already has its own `services/asset.service.ts` (8 routes, widened request DTOs). Consumers must move to it; confirm method/DTO parity with the legacy `AssetService` they used.
-- Enums/DTOs (`AssetCategory`, `AssetType`, `IAssetBrief`) — already in the new lib; confirm names match.
+Each stream: repoint imports → remove legacy deps → green build → one PR. Run B and C concurrently; A can run alongside once Phase 1 exports exist.
 
-## 4. Migration order (dependency-safe)
+### Stream A — assetus repo (self-decouple ext-assetus, issue #4)
+Replace all 41 imports of `@sneat/mod-assetus-core` / `@sneat/ext-assetus-components` inside `assetus/frontend/libs/ext-assetus/src` with the lib's own unified types/services. Remove both from `ext-assetus/package.json` peerDependencies (added in PR #3 only for lint). Verify `nx run-many -t lint test build --projects=ext-assetus assetus-app` green.
 
-Execute top-to-bottom. Each step ends green (`nx run-many -t lint test build` for the touched projects) and is its own commit/PR per repo.
+### Stream B — sneat-libs (contactus)
+Repoint `IAssetContext` (shared+internal) and `AssetService` (shared) to `@sneat/extension-assetus`. **Watch the assetus↔contactus circular-dependency risk** — assetus core historically imported contactus and vice versa; if repointing creates a cycle, break it by depending only on DTO-level exports, not components. Verify `nx run-many -t lint test build` for contactus + dependents.
 
-1. **[assetus repo] Complete the new lib's exports** (§3). Port the missing context wrappers + `carMakes` + `AssetGroup`; ensure `index.ts` exports everything the 5 consumers need. Verify `nx run-many -t lint test build --projects=ext-assetus` green. **Publish** a new version of `@sneat/extension-assetus`.
-2. **[assetus repo] Self-decouple ext-assetus** (issue #4): replace all 17+24 imports of `@sneat/mod-assetus-core` / `@sneat/ext-assetus-components` inside `ext-assetus/src` with the lib's own unified types/services. Remove those two from `ext-assetus/package.json` peerDependencies (added in PR #3 only to satisfy lint). Verify green. **This removes the unification's own coupling.**
-3. **[sneat-libs] Migrate `contactus/shared` + `contactus/internal`**: repoint `IAssetContext` + `AssetService` to `@sneat/extension-assetus`. Verify `nx run-many -t lint test build` for contactus + dependents. *(Do contactus before the sneat-apps consumers, since shared libs sit lower in the graph.)*
-4. **[sneat-apps] Migrate `budgetus`**: repoint `AssetGroup`. Verify.
-5. **[sneat-apps] Migrate `docus`**: repoint `IAssetDocumentContext` + `AssetService` (12 imports). Verify. *(Largest external consumer.)*
-6. **[sneat-apps] Migrate the legacy `pages`** (`sneat-apps/libs/extensions/assetus/pages/`): these are superseded by the new lib's pages — confirm routing now uses the new lib's pages, then they can be removed with the legacy libs.
-7. **[verify] No remaining importers**: `grep -rl '@sneat/mod-assetus-core\|@sneat/ext-assetus-components' sneat-apps/libs sneat-libs/libs assetus/frontend/libs | grep -v node_modules` returns **nothing** (outside the legacy dirs themselves).
-8. **[delete]** Remove `sneat-libs/libs/extensions/assetus/{core,components}` and `sneat-apps/libs/extensions/assetus/pages`, plus their project.json/tsconfig path mappings + workspace references. Run full `nx run-many -t lint test build` across affected projects. Follow the relocation-notice PRs with deletion PRs.
+### Stream C — sneat-apps (docus + budgetus, sequential within the agent)
+1. `budgetus`: repoint `AssetGroup`. Verify.
+2. `docus`: repoint `IAssetDocumentContext` + `AssetService` (12 imports). Verify.
+Run `nx run-many -t lint test build --projects=docus budgetus` (+ dependents) green.
 
-## 5. Verification gate (every step)
+## 6. PHASE 3 — Delete (SERIAL barrier — only after all of Phase 2 merged)
 
-- `nx run-many -t lint test build --projects=<touched>` exits 0.
-- No new `@sneat/mod-assetus-core` / `@sneat/ext-assetus-components` imports introduced.
-- Behaviour parity: the migrated consumer renders/works as before (component specs or manual check).
-- After step 8: full affected-project build green AND the grep in step 7 is empty.
+1. **Importer check:** `grep -rl '@sneat/mod-assetus-core\|@sneat/ext-assetus-components' sneat-apps/libs sneat-libs/libs assetus/frontend/libs | grep -v node_modules` returns **nothing** outside the legacy dirs themselves.
+2. **Migrate/retire legacy pages** `sneat-apps/libs/extensions/assetus/pages/` (superseded by the new lib's pages; confirm routing uses the new pages).
+3. **Delete** `sneat-libs/libs/extensions/assetus/{core,components}` and `sneat-apps/libs/extensions/assetus`, plus their `project.json`/`tsconfig` path mappings and workspace references.
+4. Full `nx run-many -t lint test build` across affected projects green.
+5. Deletion PRs (one per repo); close issue #4.
 
-## 6. Risks / notes
+## 7. Ready-to-use subagent prompts
 
-- **Cross-repo publish coupling**: external consumers (sneat-apps, sneat-libs) can only migrate once `@sneat/extension-assetus` is published with the needed exports. Sequence the publish (step 1) first.
-- **`AssetService` parity**: the new service has widened request DTOs and the 8 real routes; confirm docus/contactus usages map cleanly (esp. any method signatures they relied on).
-- **Context wrappers** (`IAsset*Context`) are UI-model glue, not pure DTOs — port them carefully (they wrap the DTO + space context).
-- This touches **three repos** (assetus, sneat-apps, sneat-libs) → expect **one PR per repo**, merged in the §4 order.
-- Legacy `core` also feeds `contactus` — assetus and contactus had a bidirectional relationship; watch for circular-dependency surprises when repointing.
+> Each Phase-2 agent works in ONE repo only, stages with `git add`, opens its own PR, and must end with the repo's `nx run-many -t lint test build` green for the touched projects. Do not let two agents run nx in the same workspace concurrently.
 
-## 7. Definition of done
+**Phase 1 (publish) — assetus:**
+> "In /Users/.../assetus/frontend, port the missing exports into `@sneat/extension-assetus` (libs/ext-assetus): context wrappers IAssetContext/IAssetDocumentContext/IAssetDwellingContext (from legacy sneat-libs/.../assetus/core/src/lib/contexts), carMakes/IMake/IModel (…/data/car-makes-with-models.ts), AssetGroup uimodel (…/uimodels/asset-group.ts) — reconcile with the new IAssetGroupInfo. Export everything the 5 consumers in docs/legacy-frontend-retirement-plan.md §3 need from the lib's index.ts. Verify `npx nx run-many -t lint test build --projects=ext-assetus` is green. Then publish a new lib version per the repo's release process. Stage; open a PR. Report the new version + the exported symbol list."
 
-- All 5 consumers import only `@sneat/extension-assetus` (or no assetus at all).
-- `sneat-libs/libs/extensions/assetus` and `sneat-apps/libs/extensions/assetus` are **deleted**.
+**Stream A — assetus (self-decouple):**
+> "In assetus/frontend/libs/ext-assetus/src, replace every import from `@sneat/mod-assetus-core` and `@sneat/ext-assetus-components` with the lib's own unified types/services (dto/asset.ts, dto/extras.ts, services/asset.service.ts). Remove both packages from ext-assetus/package.json peerDependencies. `npx nx run-many -t lint test build --projects=ext-assetus assetus-app` must be green. Stage; open a PR closing issue #4's ext-assetus part."
+
+**Stream B — sneat-libs (contactus):**
+> "In sneat-libs, repoint contactus/shared and contactus/internal off `@sneat/mod-assetus-core` (IAssetContext) and `@sneat/ext-assetus-components` (AssetService) onto `@sneat/extension-assetus`. Beware an assetus↔contactus dependency cycle — depend on DTO-level exports only, not components. `npx nx run-many -t lint test build` for contactus + dependents must be green. Stage; open a PR."
+
+**Stream C — sneat-apps (docus + budgetus):**
+> "In sneat-apps, repoint two extensions off legacy assetus onto `@sneat/extension-assetus`, sequentially: (1) budgetus — AssetGroup; (2) docus — IAssetDocumentContext + AssetService (12 imports). `npx nx run-many -t lint test build --projects=docus budgetus` (+ dependents) must be green. Stage; open a PR."
+
+**Phase 3 — delete (barrier):**
+> "Only after the Phase-2 PRs are merged. Run the importer grep in docs/legacy-frontend-retirement-plan.md §6.1 — it must be empty outside the legacy dirs. Retire the legacy sneat-apps assetus pages, then delete sneat-libs/libs/extensions/assetus/{core,components} and sneat-apps/libs/extensions/assetus plus their project.json/tsconfig/workspace references. Full `nx run-many -t lint test build` green. Open deletion PRs per repo; close #4."
+
+## 8. Definition of done
+
+- All 5 consumers import only `@sneat/extension-assetus` (or no assetus).
+- `sneat-libs/libs/extensions/assetus` and `sneat-apps/libs/extensions/assetus` **deleted**.
 - All affected projects build/lint/test green in CI.
 - Issue sneat-co/assetus#4 closed.
