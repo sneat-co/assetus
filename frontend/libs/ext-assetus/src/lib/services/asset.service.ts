@@ -3,17 +3,20 @@ import { Injectable, inject } from '@angular/core';
 import {
   Firestore as AngularFirestore,
   CollectionReference,
+  Timestamp,
   collection,
   collectionData,
   doc,
   docData,
+  orderBy,
+  query,
 } from '@angular/fire/firestore';
 import { SneatApiService } from '@sneat/api';
 import { ISpaceContext } from '@sneat/space-models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IAssetContext } from '../contexts';
-import { IAssetDbo } from '../dto';
+import { IAssetDbo, IHistoryEvent } from '../dto';
 import {
   ICreateVehicleRecordRequest,
   ICreateVehicleRecordResponse,
@@ -35,6 +38,13 @@ export interface IIdAndAssetDbo {
   id: string;
   dbo: IAssetDbo;
 }
+
+// A history doc as stored in Firestore: identical to IHistoryEvent except
+// occurredAt is a Firestore Timestamp (converted back to an ISO string when
+// mapped). idField merges the doc id in as `id`.
+type IRawHistoryEvent = Omit<IHistoryEvent, 'occurredAt'> & {
+  occurredAt: Timestamp | string;
+};
 
 // All assetus backend endpoints live under the `assetus/` path on the shared
 // sneat API (the SneatApiService prefixes the v0 base URL).
@@ -93,14 +103,42 @@ export class AssetService {
     );
   }
 
+  // Live read of an asset's history straight from Firestore (bypasses the
+  // backend/auth call). History docs live at the subcollection
+  // spaces/{spaceID}/ext/assetus/assets/{assetID}/history; Firestore stores
+  // occurredAt as a Timestamp, so it is converted back to an ISO string to
+  // match IHistoryEvent (typed string) and the raw template render.
   public getHistory(
     spaceID: string,
     assetID: string,
   ): Observable<IAssetHistoryResponse> {
-    const params = new HttpParams({ fromObject: { spaceID, assetID } });
-    return this.sneatApiService.get<IAssetHistoryResponse>(
-      api('asset_history'),
-      params,
+    const historyCol = collection(
+      this.afs,
+      'spaces',
+      spaceID,
+      'ext',
+      'assetus',
+      'assets',
+      assetID,
+      'history',
+    ) as CollectionReference<IRawHistoryEvent>;
+    return collectionData<IRawHistoryEvent>(
+      query(historyCol, orderBy('occurredAt', 'asc')),
+      { idField: 'id' },
+    ).pipe(
+      map((docs) => ({
+        assetID,
+        events: docs.map((d): IHistoryEvent => {
+          const { occurredAt, ...rest } = d;
+          return {
+            ...rest,
+            occurredAt:
+              occurredAt instanceof Timestamp
+                ? occurredAt.toDate().toISOString()
+                : occurredAt,
+          };
+        }),
+      })),
     );
   }
 

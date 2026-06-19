@@ -1,21 +1,71 @@
 import { HttpParams } from '@angular/common/http';
 import { Injector, runInInjectionContext } from '@angular/core';
-import { Firestore } from '@angular/fire/firestore';
+import { Firestore, Timestamp } from '@angular/fire/firestore';
 import { SneatApiService } from '@sneat/api';
 import { of } from 'rxjs';
 import { AssetService } from './asset.service';
 
-// The service injects the real Firestore token at construction but only touches
-// Firestore in watchAssets (not exercised here), so a bare stub value satisfies
-// `inject(Firestore)` without mocking the @angular/fire module — module mocks
-// leak across vitest workers that also use the real Firestore, making the suite
-// flaky.
+// getHistory now reads Firestore directly via the free functions collection/
+// query/orderBy/collectionData, so this spec mocks @angular/fire/firestore. The
+// vitest.config for this lib runs the suite with isolated forks specifically so
+// this module mock cannot leak into sibling specs that use the real Firestore
+// (a leak made the suite flaky). The mock keeps the real Firestore DI token and
+// Timestamp class so providers and `instanceof Timestamp` still behave; only the
+// reads are stubbed. vi.mock is hoisted, so its spies come from vi.hoisted.
+const fs = vi.hoisted(() => {
+  const collection = vi.fn(() => ({ __type: 'collection' }));
+  const query = vi.fn((c: unknown, ...constraints: unknown[]) => ({
+    __type: 'query',
+    collection: c,
+    constraints,
+  }));
+  const orderBy = vi.fn((field: string, dir: string) => ({
+    __type: 'orderBy',
+    field,
+    dir,
+  }));
+  // Swappable docs that collectionData emits per test.
+  const state: { docs: unknown[] } = { docs: [] };
+  const collectionData = vi.fn(() => of(state.docs));
+  // Stand-in Firestore token + Timestamp class. The spec never imports the real
+  // @angular/fire module (it can't JIT-compile under vitest); both the service
+  // and this spec import Firestore/Timestamp from the same mocked module, so
+  // their identities match.
+  class Firestore {}
+  class Timestamp {
+    constructor(private readonly date: Date) {}
+    static fromDate(d: Date): Timestamp {
+      return new Timestamp(d);
+    }
+    toDate(): Date {
+      return this.date;
+    }
+  }
+  return { collection, query, orderBy, collectionData, state, Firestore, Timestamp };
+});
+
+vi.mock('@angular/fire/firestore', () => ({
+  Firestore: fs.Firestore,
+  Timestamp: fs.Timestamp,
+  collection: fs.collection,
+  query: fs.query,
+  orderBy: fs.orderBy,
+  collectionData: fs.collectionData,
+  doc: vi.fn(),
+  docData: vi.fn(),
+}));
+
 describe('AssetService', () => {
   let service: AssetService;
   let post: ReturnType<typeof vi.fn>;
   let get: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    fs.collection.mockClear();
+    fs.query.mockClear();
+    fs.orderBy.mockClear();
+    fs.collectionData.mockClear();
+    fs.state.docs = [];
     post = vi.fn(() => of({}));
     get = vi.fn(() => of({}));
     const injector = Injector.create({
@@ -162,13 +212,68 @@ describe('AssetService', () => {
     expect(post).toHaveBeenCalledWith('assetus/record_history_event', request);
   });
 
-  it('getHistory gets asset_history with spaceID+assetID params', () => {
+  it('getHistory reads the asset history subcollection from Firestore ordered by occurredAt asc (no API call)', () => {
     service.getHistory('s1', 'a1').subscribe();
-    expect(get).toHaveBeenCalledTimes(1);
-    const [endpoint, params] = get.mock.calls[0];
-    expect(endpoint).toBe('assetus/asset_history');
-    expect((params as HttpParams).get('spaceID')).toBe('s1');
-    expect((params as HttpParams).get('assetID')).toBe('a1');
+
+    // Reads spaces/s1/ext/assetus/assets/a1/history, not the backend.
+    expect(get).not.toHaveBeenCalled();
+    expect(fs.collection).toHaveBeenCalledWith(
+      {}, // injected stub Firestore
+      'spaces',
+      's1',
+      'ext',
+      'assetus',
+      'assets',
+      'a1',
+      'history',
+    );
+    expect(fs.orderBy).toHaveBeenCalledWith('occurredAt', 'asc');
+    // The query is built from the history collection + the orderBy constraint.
+    const [collArg] = fs.query.mock.calls[0];
+    expect(collArg).toEqual({ __type: 'collection' });
+    expect(fs.collectionData).toHaveBeenCalledWith(
+      expect.objectContaining({ __type: 'query' }),
+      { idField: 'id' },
+    );
+  });
+
+  it('getHistory returns { assetID, events } and converts a Firestore Timestamp occurredAt to an ISO string', () => {
+    fs.state.docs = [
+      {
+        id: 'h1',
+        type: 'repaired',
+        occurredAt: Timestamp.fromDate(new Date('2024-03-04T05:06:07.000Z')),
+        actorRef: 'u1',
+        note: 'fixed',
+      },
+    ];
+
+    let result:
+      | { assetID: string; events: { occurredAt: string }[] }
+      | undefined;
+    service.getHistory('s1', 'a1').subscribe((r) => (result = r as never));
+
+    expect(result?.assetID).toBe('a1');
+    expect(result?.events).toHaveLength(1);
+    // Timestamp -> ISO string (matches IHistoryEvent.occurredAt: string).
+    expect(result?.events[0].occurredAt).toBe('2024-03-04T05:06:07.000Z');
+    expect(typeof result?.events[0].occurredAt).toBe('string');
+  });
+
+  it('getHistory passes through an occurredAt that is already an ISO string', () => {
+    fs.state.docs = [
+      {
+        id: 'h1',
+        type: 'repaired',
+        occurredAt: '2024-01-02T03:04:05.000Z',
+        actorRef: 'u1',
+      },
+    ];
+
+    let result: { events: { occurredAt: string }[] } | undefined;
+    service.getHistory('s1', 'a1').subscribe((r) => (result = r as never));
+
+    expect(result?.events[0].occurredAt).toBe('2024-01-02T03:04:05.000Z');
   });
 
   it('addVehicleRecord posts to create_vehicle_record with the request', () => {
@@ -186,9 +291,8 @@ describe('AssetService', () => {
     expect(post).toHaveBeenCalledWith('assetus/create_vehicle_record', request);
   });
 
-  // watchAssetByID's happy path reads Firestore (like watchAssets, deliberately
-  // not exercised here to avoid the cross-worker @angular/fire module-mock leak
-  // noted above). Its required-spaceID guard is reachable without Firestore.
+  // watchAssetByID's required-spaceID guard is reachable without touching
+  // Firestore; its happy path (a Firestore read) is left to integration cover.
   it('watchAssetByID throws when the space has no id', () => {
     expect(() =>
       service.watchAssetByID({ id: '' } as never, 'a1'),

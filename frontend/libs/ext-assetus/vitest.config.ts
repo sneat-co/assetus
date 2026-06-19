@@ -14,6 +14,12 @@ export default defineConfig({
     ],
   },
   test: {
+    // asset.service.spec mocks @angular/fire/firestore (getHistory reads
+    // Firestore directly). Isolated forks give every test file its own module
+    // registry so that mock can never leak into sibling specs that use the real
+    // Firestore — a shared worker registry made the suite load-order flaky.
+    pool: 'forks',
+    isolate: true,
     // jsdom + the analog TestBed setup (injected by @nx/angular:unit-test) so
     // the ported standalone Angular components/pages can be created and rendered
     // in specs. Pure-logic specs (DTOs, services) run fine under jsdom too.
