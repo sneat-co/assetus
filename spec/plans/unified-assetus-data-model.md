@@ -34,7 +34,7 @@ Relocate legacy `const4assetus` (`AssetCategory`, `AssetStatus`, `AssetPossessio
 
 **Verifies:** unified-assetus-data-model#ac:optional-legacy-fields-roundtrip, unified-assetus-data-model#ac:leasing-asset-representable, unified-assetus-data-model#ac:possession-defaults-owning, unified-assetus-data-model#ac:financial-fields-have-a-home
 **Depends-On:** 1
-**Status:** pending
+**Status:** done
 
 Adapt the legacy `AssetBrief`/`AssetBaseDbo`/`AssetDbo` (and `briefs4assetus`) fields onto the MVP flat `AssetBase`/`AssetDbo` in `assetus/backend/dbo4assetus`, keeping the MVP fields and adding the legacy ones as **optional**: `CountryID`, `AssetDates`, `yearOfBuild`, custom fields, tags, `geo`, `isRequest`, `parentCategoryID`, `Possession` (default `owning`), and the financial fields folded into core (`ITotalsHolder` totals, income/expense capability flags + direction, asset-side liability linkage `liabilities`/`notUsedServiceTypes`/`AssetLiabilityInfo`). Ensure a leased asset (possession independent of status) round-trips.
 
