@@ -8,9 +8,10 @@ import {
 import { FormsModule } from '@angular/forms';
 import { IonInput, IonItem } from '@ionic/angular/standalone';
 import { SelectFromListComponent } from '@sneat/ui';
-import { AssetType, carMakes, IMake, IModel } from '@sneat/mod-assetus-core';
+import { AssetType } from '../../dto';
+import { carMakes, IMake, IModel } from '../../data';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-make-model-card',
   templateUrl: './make-model-card.component.html',

@@ -9,11 +9,11 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonCard, IonInput, IonItem, IonList } from '@ionic/angular/standalone';
 import { CountrySelectorComponent } from '@sneat/components';
-import { IAssetContext, IAssetDwellingContext } from '@sneat/mod-assetus-core';
+import { IAssetContext, IAssetDwellingContext } from '../../contexts';
 import { ISpaceContext } from '@sneat/space-models';
 import { AssetPossessionCardComponent } from '../asset-possession-card/asset-possession-card.component';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-edit-dwelling-card',
   templateUrl: './edit-dwelling-card.component.html',
@@ -57,7 +57,7 @@ export class AddDwellingCardComponent implements OnChanges {
     }
 
     if (changes['dwellingAsset']) {
-      this.title = this.dwellingAsset?.dbo?.title || '';
+      this.title = this.dwellingAsset?.dbo?.name || '';
       this.address = this.dwellingAsset?.dbo?.extra?.address?.lines || '';
       this.rent_price_amount =
         this.dwellingAsset?.dbo?.extra?.rent_price?.value;

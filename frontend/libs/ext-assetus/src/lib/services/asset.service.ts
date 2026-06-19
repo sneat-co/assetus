@@ -5,10 +5,14 @@ import {
   CollectionReference,
   collection,
   collectionData,
+  doc,
+  docData,
 } from '@angular/fire/firestore';
 import { SneatApiService } from '@sneat/api';
+import { ISpaceContext } from '@sneat/space-models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { IAssetContext } from '../contexts';
 import { IAssetDbo } from '../dto';
 import {
   ICreateVehicleRecordRequest,
@@ -117,6 +121,24 @@ export class AssetService {
       idField: 'id',
     }).pipe(
       map((dbos) => dbos.map((dbo) => ({ id: dbo.id, dbo }))),
+    );
+  }
+
+  // Live watch of a single asset document, emitting an IAssetContext
+  // ({ id, space, dbo }) on every change. Matches the legacy AssetService
+  // watchAssetByID(space, id) signature exactly (it was the inherited
+  // ModuleSpaceItemService.watchSpaceItemByIdWithSpaceRef) so consumers are a
+  // drop-in repoint. Reads the doc at spaces/{spaceID}/ext/assetus/assets/{id}.
+  public watchAssetByID(
+    space: ISpaceContext,
+    id: string,
+  ): Observable<IAssetContext> {
+    if (!space.id) {
+      throw new Error('spaceID is required');
+    }
+    const assetDoc = doc(this.assetsCollection(space.id), id);
+    return docData<IAssetDbo>(assetDoc, { idField: 'id' }).pipe(
+      map((dbo) => ({ space, id, dbo })),
     );
   }
 

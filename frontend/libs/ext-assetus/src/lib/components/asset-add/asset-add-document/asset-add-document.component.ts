@@ -15,18 +15,19 @@ import { timestamp } from '@sneat/dto';
 import {
   AssetPossession,
   AssetVehicleType,
+  IAssetDboBase,
+  IAssetExtra,
+  IAssetDocumentExtra,
+} from '../../../dto';
+import {
   IAssetContext,
   IAssetDocumentContext,
-  IAssetDocumentExtra,
-} from '@sneat/mod-assetus-core';
+} from '../../../contexts';
 import { SpaceComponentBaseParams } from '@sneat/space-components';
 import { format, parseISO } from 'date-fns';
-import {
-  AddAssetBaseComponent,
-  ICreateAssetRequest,
-} from '@sneat/ext-assetus-components';
+import { AddAssetBaseComponent } from '../add-asset-base.component';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-asset-add-document',
   templateUrl: './asset-add-document.component.html',
@@ -77,15 +78,17 @@ export class AssetAddDocumentComponent
   ngOnChanges(changes: SimpleChanges): void {
     const spaceChanges = changes['space'];
     if (spaceChanges && this.space) {
-      const a: IAssetContext<'document'> = this.documentAsset ?? {
+      const a: IAssetDocumentContext = this.documentAsset ?? ({
         id: '',
         space: this.space ?? { id: '' },
         dbo: {
           status: 'draft',
-          category: 'vehicle',
+          // Live AssetCategory for a document (the legacy add-document component
+          // seeded 'vehicle' here — a pre-existing inconsistency with its
+          // 'document' extraType; aligned to the coherent live value).
+          category: 'document',
           extraType: 'document',
           extra: {},
-          spaceID: this.space?.id,
           type: this.documentType,
           title: '',
           possession: undefined as unknown as AssetPossession,
@@ -94,7 +97,7 @@ export class AssetAddDocumentComponent
           updatedAt: new Date().toISOString() as unknown as timestamp,
           updatedBy: '-',
         },
-      };
+      } as unknown as IAssetDocumentContext);
       this.documentAsset = { ...a, space: this.space };
     }
   }
@@ -112,7 +115,7 @@ export class AssetAddDocumentComponent
           type: this.documentType,
           extraType: 'document',
           extra: {},
-        },
+        } as unknown as IAssetDocumentContext['dbo'],
       };
     }
   }
@@ -135,12 +138,15 @@ export class AssetAddDocumentComponent
       throw new Error('no asset');
     }
     this.isSubmitting = true;
-    let request: ICreateAssetRequest<'document', IAssetDocumentExtra> = {
+    let request: {
+      asset: IAssetDboBase<'document', IAssetDocumentExtra & IAssetExtra>;
+      spaceID: string;
+    } = {
       asset: {
         ...assetDto,
         status: 'active',
-        category: 'vehicle',
-      },
+        category: 'document',
+      } as unknown as IAssetDboBase<'document', IAssetDocumentExtra & IAssetExtra>,
       spaceID: this.space?.id,
     };
     if (this.yearOfBuild) {

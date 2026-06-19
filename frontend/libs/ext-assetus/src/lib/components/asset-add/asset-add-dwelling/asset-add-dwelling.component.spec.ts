@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { WritableSignal } from '@angular/core';
 import { EMPTY } from 'rxjs';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../../services';
 import { spacePageTestProviders } from '../../../../testing/test-providers';
 import { AssetAddDwellingComponent } from './asset-add-dwelling.component';
 
@@ -83,7 +83,7 @@ describe('AssetAddDwellingComponent', () => {
     seedSpace();
     component.ngOnChanges({ space: {} as never });
     expect(component.dwellingAsset?.dbo?.category).toBe('dwelling');
-    expect(component.dwellingAsset?.dbo?.spaceID).toBe('s1');
+    expect(component.dwellingAsset?.space?.id).toBe('s1');
   });
 
   it('ngOnChanges ignores change sets without a space key', () => {
@@ -114,15 +114,13 @@ describe('AssetAddDwellingComponent', () => {
     expect(
       (component as unknown as { isSubmitting: boolean }).isSubmitting,
     ).toBe(true);
-    const request = createAsset.mock.calls[0][1] as {
-      asset: {
-        status: string;
-        extra: { numberOfBedrooms: number; areaSqM: number };
-      };
+    const request = createAsset.mock.calls[0][0] as {
+      status: string;
+      extra: { numberOfBedrooms: number; areaSqM: number };
     };
-    expect(request.asset.status).toBe('active');
-    expect(request.asset.extra.numberOfBedrooms).toBe(3);
-    expect(request.asset.extra.areaSqM).toBe(85);
+    expect(request.status).toBe('active');
+    expect(request.extra.numberOfBedrooms).toBe(3);
+    expect(request.extra.areaSqM).toBe(85);
   });
 
   it('submitDwellingForm creates the asset without numeric extras', () => {

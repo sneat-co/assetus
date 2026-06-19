@@ -27,7 +27,7 @@
                 }}
               }
               @if (
-                asset.brief.title &&
+                asset.brief.name &&
                 asset.brief.extra?.["make"] &&
                 asset.brief.extra?.["model"]
               ) {
@@ -35,11 +35,11 @@
               }
             }
             @case ("dwelling") {
-              {{ asset.brief.extra?.["address"] || asset.brief.title }}
+              {{ asset.brief.extra?.["address"] || asset.brief.name }}
             }
           }
-          @if (asset.brief.title) {
-            {{ asset.brief.title }}
+          @if (asset.brief.name) {
+            {{ asset.brief.name }}
           }
         </ion-label>
         @if (asset.brief.yearOfBuild && !asset.brief.extra?.["regNumber"]) {
@@ -53,7 +53,7 @@
           </ion-badge>
         }
         <ion-buttons slot="end">
-          @if (asset.brief.category === "vehicle") {
+          @if (asset.brief.category === "vehicles") {
             <ion-button (click)="addNewMilesAndFuel($event, asset)">
               <ion-icon name="add" slot="start"></ion-icon>
               <ion-label>Record miles</ion-label>

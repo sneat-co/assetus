@@ -11,6 +11,7 @@ export * from './mileage-dialog/mileage-dialog.component';
 export * from './vehicle-card/vehicle-card.component';
 export * from './edit-dwelling-card/edit-dwelling-card.component';
 export * from './assets-list/assets-list.component';
+export * from './asset-add/add-asset-base.component';
 export * from './asset-add/asset-add-vehicle/asset-add-vehicle.component';
 export * from './asset-add/asset-add-dwelling/asset-add-dwelling.component';
 export * from './asset-add/asset-add-document/asset-add-document.component';

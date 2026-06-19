@@ -10,10 +10,10 @@ import {
   EngineTypes,
   FuelType,
   FuelTypes,
-  IAssetVehicleContext,
-} from '@sneat/mod-assetus-core';
+} from '../../dto';
+import { IAssetVehicleContext } from '../../contexts';
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-vehicle-engine',
   templateUrl: './vehicle-engine.component.html',

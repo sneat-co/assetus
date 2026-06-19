@@ -11,7 +11,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { Period } from '@sneat/dto';
-import { IAssetContext, IAssetDtoGroup } from '@sneat/mod-assetus-core';
+import { IAssetContext } from '../../contexts';
+import { IAssetDtoGroup } from '../../dto';
 import { AssetCardComponent, PeriodSegmentComponent } from '../../components';
 import {
   SpaceBaseComponent,

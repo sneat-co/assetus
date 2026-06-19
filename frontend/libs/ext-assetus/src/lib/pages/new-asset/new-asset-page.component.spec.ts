@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../services';
 import { spacePageTestProviders } from '../../../testing/test-providers';
 import { NewAssetPageComponent } from './new-asset-page.component';
 
 // Render spec for the ported NewAssetPageComponent. It extends
-// SpaceBaseComponent and embeds the asset-add-* components (legacy
-// AssetService), so it needs the standard chain plus a stub legacy service.
+// SpaceBaseComponent and embeds the asset-add-* components (AssetService),
+// so it needs the standard chain plus a stub service.
 describe('NewAssetPageComponent', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({

@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../services';
 import { SpaceNavService } from '@sneat/space-services';
 import { spacePageTestProviders } from '../../../testing/test-providers';
 import { RealEstatesPageComponent } from './real-estates-page.component';
 
 // Render spec for the ported RealEstatesPageComponent. It extends
-// SpaceBaseComponent and embeds AssetsListComponent (legacy AssetService +
+// SpaceBaseComponent and embeds AssetsListComponent (AssetService +
 // SpaceNavService + ModalController).
 describe('RealEstatesPageComponent', () => {
   beforeEach(() =>
@@ -13,7 +13,7 @@ describe('RealEstatesPageComponent', () => {
       imports: [RealEstatesPageComponent],
       providers: [
         ...spacePageTestProviders(),
-        { provide: AssetService, useValue: { deleteAsset: vi.fn() } },
+        { provide: AssetService, useValue: { removeAsset: vi.fn() } },
         {
           provide: SpaceNavService,
           useValue: { navigateForwardToSpacePage: vi.fn(() => Promise.resolve(true)) },

@@ -12,7 +12,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { IAssetContext } from '@sneat/mod-assetus-core';
+import { IAssetContext } from '../../contexts';
 import { RealEstateLocationComponent } from '../../components';
 import {
   SpaceBaseComponent,

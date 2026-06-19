@@ -42,7 +42,7 @@ describe('AddDwellingCardComponent', () => {
   it('hydrates local fields from the dwelling asset on changes', () => {
     component.dwellingAsset = dwellingAsset({
       category: 'dwelling',
-      title: 'Flat 1',
+      name: 'Flat 1',
       extra: {
         address: { lines: '1 Main St' },
         rent_price: { value: 1200, currency: 'EUR' },

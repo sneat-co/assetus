@@ -19,7 +19,7 @@ describe('AssetDatesComponent', () => {
 
   it('builds the vehicle date rows from the vehicle extra', () => {
     component.asset = {
-      category: 'vehicle',
+      category: 'vehicles',
       extra: { nctExpires: '2026-01-01', taxExpires: '2026-02-02' },
     } as never;
     const items = (component as unknown as { items: { name: string; value?: string }[] }).items;
@@ -54,7 +54,7 @@ describe('AssetDatesComponent', () => {
 
   it('renders a date row per item once an asset is set', () => {
     component.asset = {
-      category: 'vehicle',
+      category: 'vehicles',
       extra: { nctExpires: '2026-01-01' },
     } as never;
     fixture.detectChanges();

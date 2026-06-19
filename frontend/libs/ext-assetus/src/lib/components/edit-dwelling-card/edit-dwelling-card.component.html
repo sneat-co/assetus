@@ -5,12 +5,12 @@
         label="Title"
         placeholder="Dwelling Title"
         [(ngModel)]="this.title"
-        (ngModelChange)="onBriefFieldChanged('title', $event)"
+        (ngModelChange)="onBriefFieldChanged('name', $event)"
       />
     </ion-item>
     <sneat-country-selector
-      [countryID]="dwellingAsset?.brief?.countryID"
-      [readonly]="!!dwellingAsset?.brief?.countryID"
+      [countryID]="dwellingAsset?.dbo?.countryID"
+      [readonly]="!!dwellingAsset?.dbo?.countryID"
       [defaultCountryID]="space?.dbo?.countryID"
       label="Country"
       (countryIDChange)="onCountryChanged($event)"

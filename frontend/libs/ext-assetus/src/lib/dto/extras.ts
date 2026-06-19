@@ -8,6 +8,7 @@
 import { CountryId } from '@sneat/dto';
 import {
   AssetDocumentType,
+  AssetExtraType,
   EngineType,
   FuelType,
   FuelVolumeUnit,
@@ -17,7 +18,7 @@ import {
 
 // --- extraType discriminator (backend extras4assetus.AssetExtraType*) ---
 
-export type AssetExtraType = 'vehicle' | 'dwelling' | 'document';
+export type { AssetExtraType };
 
 export const assetExtraTypeVehicle: AssetExtraType = 'vehicle';
 export const assetExtraTypeDwelling: AssetExtraType = 'dwelling';

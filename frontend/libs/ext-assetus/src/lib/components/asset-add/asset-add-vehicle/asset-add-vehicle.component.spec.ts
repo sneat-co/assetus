@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { WritableSignal } from '@angular/core';
 import { EMPTY } from 'rxjs';
-import { AssetService } from '@sneat/ext-assetus-components';
+import { AssetService } from '../../../services';
 import { spacePageTestProviders } from '../../../../testing/test-providers';
 import { AssetAddVehicleComponent } from './asset-add-vehicle.component';
 
@@ -27,7 +27,7 @@ describe('AssetAddVehicleComponent', () => {
     ({
       id: 'a1',
       space: { id: 's1' },
-      dbo: { category: 'vehicle', extra: { make: '', model: '' } },
+      dbo: { category: 'vehicles', extra: { make: '', model: '' } },
     }) as never;
 
   beforeEach(() => {
@@ -76,7 +76,7 @@ describe('AssetAddVehicleComponent', () => {
   it('ngOnChanges seeds a draft asset when space arrives', () => {
     seedSpace();
     component.ngOnChanges({ space: {} as never });
-    expect(component.vehicleAsset?.dbo?.category).toBe('vehicle');
+    expect(component.vehicleAsset?.dbo?.category).toBe('vehicles');
     expect(component.vehicleAsset?.space?.id).toBe('s1');
   });
 
@@ -142,11 +142,12 @@ describe('AssetAddVehicleComponent', () => {
     expect(
       (component as unknown as { isSubmitting: boolean }).isSubmitting,
     ).toBe(true);
-    const request = createAsset.mock.calls[0][1] as {
-      asset: { status: string; yearOfBuild: number };
+    const request = createAsset.mock.calls[0][0] as {
+      status: string;
+      yearOfBuild: number;
     };
-    expect(request.asset.status).toBe('active');
-    expect(request.asset.yearOfBuild).toBe(2020);
+    expect(request.status).toBe('active');
+    expect(request.yearOfBuild).toBe(2020);
   });
 
   it('submitVehicleForm omits yearOfBuild when it is blank', () => {
@@ -156,9 +157,9 @@ describe('AssetAddVehicleComponent', () => {
     (
       component as unknown as { submitVehicleForm(): void }
     ).submitVehicleForm();
-    const request = createAsset.mock.calls[0][1] as {
-      asset: { yearOfBuild?: number };
+    const request = createAsset.mock.calls[0][0] as {
+      yearOfBuild?: number;
     };
-    expect(request.asset.yearOfBuild).toBeUndefined();
+    expect(request.yearOfBuild).toBeUndefined();
   });
 });

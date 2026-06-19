@@ -7,11 +7,7 @@ import {
   IonItemGroup,
   IonLabel,
 } from '@ionic/angular/standalone';
-import {
-  IAssetDbo,
-  IAssetDboBase,
-  IAssetVehicleExtra,
-} from '@sneat/mod-assetus-core';
+import { IAssetDboBase, IAssetVehicleExtra } from '../../dto';
 
 interface AssetDate {
   name: string;
@@ -19,7 +15,7 @@ interface AssetDate {
   value?: string;
 }
 
-// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+// Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({
   selector: 'assetus-asset-dates',
   templateUrl: './asset-dates.component.html',
@@ -38,8 +34,8 @@ export class AssetDatesComponent {
   @Input() set asset(v: IAssetDboBase) {
     this.assetDto = v;
     switch (v.category) {
-      case 'vehicle': {
-        const vehicle = v as IAssetDbo<'vehicle', IAssetVehicleExtra>;
+      case 'vehicles': {
+        const vehicle = v as IAssetDboBase<'vehicle', IAssetVehicleExtra>;
         this.items = [
           {
             name: 'nctExpires',
