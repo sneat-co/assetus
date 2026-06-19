@@ -18,6 +18,40 @@ These are **hard gates**. A stream is not done — and its PR must not merge —
 
 ---
 
+## 0.5 Concurrency & git safety (HARD rules — parallel streams MUST NOT clobber each other)
+
+Streams/subagents run concurrently and may share a filesystem/checkout. A stray `git switch` or a blanket `git add` in one stream can corrupt another's work, and an unrelated session can switch a branch underneath an agent. Enforce ALL of:
+
+1. **Dedicated branch per stream, created at start, recorded.** Each stream creates and records its own branch off `origin/main`:
+   `git switch -c retire-legacy-assetus/<repo> origin/main` (e.g. `retire-legacy-assetus/sneat-apps`).
+   The orchestrator keeps the `{repo → branch}` map and passes each subagent its **exact expected branch name**.
+
+2. **Prefer a dedicated git worktree per stream — strongest isolation.** A branch switch in one worktree never affects another:
+   `git worktree add ../wt-retire-<repo> -b retire-legacy-assetus/<repo> origin/main` and work inside it.
+   If driven by the **Workflow tool, use `isolation: 'worktree'` per agent** (it does this automatically). Any two streams that could touch the **same repo** (e.g. Phase 1 publish and Stream A self-decouple, both in `assetus`) MUST either be **serialized** or use **separate worktrees** — never run concurrently in one shared checkout.
+
+3. **Track edited files explicitly.** Maintain the exact list of paths this stream/subagent edits. **NEVER** stage with `git add -A`, `git add .`, or `git add -u`.
+
+4. **Pre-commit guard — run before EVERY commit (orchestrator and every subagent):**
+   ```bash
+   # 1. Assert we are on our own branch (abort if a parallel session switched it)
+   test "$(git rev-parse --abbrev-ref HEAD)" = "<expected-branch>" || { echo "WRONG BRANCH — abort"; exit 1; }
+   # 2. Stage ONLY this stream's tracked files, by explicit path:
+   git add <file1> <file2> ...        # never -A / . / -u
+   # 3. Confirm nothing leaked in from another stream:
+   git diff --cached --name-only | sort > /tmp/staged.$$
+   printf '%s\n' <file1> <file2> ... | sort > /tmp/expected.$$
+   diff /tmp/staged.$$ /tmp/expected.$$ || { echo "UNEXPECTED STAGED FILES — abort"; git restore --staged .; exit 1; }
+   # 4. Only now commit
+   git commit -m "..."
+   ```
+
+5. **Never switch branches mid-work** in a shared (non-worktree) checkout, and **never force-push another stream's branch**. If you must read another branch, use `git show <branch>:<path>` — do not check it out.
+
+6. **One agent per repo at a time** (the §1 model). The orchestrator MUST NOT dispatch two agents that write to the same repo concurrently unless each is in its own worktree (rule 2).
+
+---
+
 ## 1. Execution model (read first)
 
 This is a **pipeline with barriers**, not a flat fan-out. There is a serial gate at the front and a serial barrier at the end; only the middle parallelizes.
@@ -112,7 +146,7 @@ Run `nx run-many -t lint test build --projects=docus budgetus` (+ dependents) gr
 
 ## 7. Ready-to-use subagent prompts
 
-> Each Phase-2 agent works in ONE repo only, stages with `git add`, opens its own PR, and must end with the repo's `nx run-many -t lint test build --coverage` green for the touched projects. Do not let two agents run nx in the same workspace concurrently. **§0 applies to every prompt below: zero functionality lost, ≥80% / no-coverage-regression, and a behaviour-parity note + coverage number in the PR.** Each prompt below implicitly carries these — repeat them to the subagent.
+> Each Phase-2 agent works in ONE repo only, on its **own dedicated branch `retire-legacy-assetus/<repo>` created off `origin/main`** (ideally its own git worktree — §0.5 rule 2), stages **only its tracked files by explicit path** through the §0.5 pre-commit guard, opens its own PR, and must end with the repo's `nx run-many -t lint test build --coverage` green for the touched projects. Do not let two agents run nx — or write — in the same workspace concurrently. **§0 + §0.5 apply to every prompt below: zero functionality lost, ≥80% / no-coverage-regression, behaviour-parity + coverage evidence in the PR, dedicated branch/worktree, explicit-path staging, and the pre-commit branch+staged-files guard.** Each prompt below implicitly carries these — repeat them to the subagent, including its exact expected branch name.
 
 **Phase 1 (publish) — assetus:**
 > "In /Users/.../assetus/frontend, port the missing exports into `@sneat/extension-assetus` (libs/ext-assetus): context wrappers IAssetContext/IAssetDocumentContext/IAssetDwellingContext (from legacy sneat-libs/.../assetus/core/src/lib/contexts), carMakes/IMake/IModel (…/data/car-makes-with-models.ts), AssetGroup uimodel (…/uimodels/asset-group.ts) — reconcile with the new IAssetGroupInfo. Export everything the 5 consumers in docs/legacy-frontend-retirement-plan.md §3 need from the lib's index.ts. Verify `npx nx run-many -t lint test build --projects=ext-assetus` is green. Then publish a new lib version per the repo's release process. Stage; open a PR. Report the new version + the exported symbol list."
