@@ -68,7 +68,7 @@ Relocate every legacy component from `sneat-libs/.../components/src/lib/` into `
 
 **Verifies:** assetus-frontend-port#ac:all-pages-accounted
 **Depends-On:** 5
-**Status:** in-progress
+**Status:** done
 
 Relocate every legacy page from `sneat-apps/.../pages/src/lib/` into `assetus/frontend/libs/ext-assetus/src/lib/pages/` and wire into `assetus-routing.ts`: `assets`, `asset`, `new-asset`, `real-estates`+`real-estate`, `asset-group`, `optimization`, the `liability/*` pages (`liability-new`, `select-service-provider`), and the shared `asset-base.page`/`assets-base.page`. Reconcile the existing MVP pages (`assets`, `asset`, `transfer`, `new-asset-dialog`) into the ported set rather than duplicating; any page intentionally not ported (e.g. the standalone liabilities pages → liabilities sibling Feature) gets an explicit deferral reason recorded for the coverage table (Task 7).
 
@@ -76,7 +76,7 @@ Relocate every legacy page from `sneat-apps/.../pages/src/lib/` into `assetus/fr
 
 **Verifies:** assetus-frontend-port#ac:liabilities-disposition-recorded, assetus-frontend-port#ac:frontend-capability-coverage-complete, assetus-frontend-port#ac:frontend-builds-and-tests-pass
 **Depends-On:** 6
-**Status:** pending
+**Status:** in-progress
 
 Author the frontend capability-coverage table mapping every legacy frontend capability (each `core` DTO incl. `dto-liability.ts`/`dto-service-provider.ts`, each of the ~19 components, each page, each service) to its ported new location, an intentional change, or the named liabilities sibling Feature. Record the liabilities disposition explicitly: asset-side linkage fields folded into the core DTO (Task 1); standalone provider/plan/settlement DTOs/components/pages either ported or assigned to the sibling Feature — none unassigned. Make the workspace lint/build/test green from `assetus/frontend` (`nx run-many -t lint build test` or the `ext-assetus` targets exit zero).
 

@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="$defaultBackUrl()" />
+    </ion-buttons>
+    @if ($asset(); as asset) {
+      <ion-title>{{ asset.brief?.title || asset.dbo?.title }}</ion-title>
+    } @else {
+      <ion-title>Property</ion-title>
+    }
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if ($asset(); as asset) {
+    @if (asset.brief?.category === "dwelling") {
+      <sneat-real-estate-location [asset]="asset" />
+    }
+  }
+
+  <ion-item-group>
+    <ion-item-divider color="light">
+      <ion-label>Finance</ion-label>
+    </ion-item-divider>
+    <ion-item>
+      <ion-label>Rent</ion-label>
+      <ion-badge color="light">€1,880.00</ion-badge>
+    </ion-item>
+  </ion-item-group>
+</ion-content>

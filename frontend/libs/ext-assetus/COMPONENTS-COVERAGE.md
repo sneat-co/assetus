@@ -90,3 +90,49 @@ duplicated is covered by the ported `assets-list`.
 | asset-component-base-params.ts | Injectable params wrapper around the legacy `AssetService`; consumed from the published lib by the deferred bases. Not re-ported. |
 | services/ (asset-service.ts, asset-service.dto.ts, assetus-space.service.ts, assetus-services.module.ts) | NOT UI components. The legacy service is consumed from published `@sneat/ext-assetus-components`; the MVP has its own `services/asset.service.ts` (FE Tasks 1-4). |
 | testing/test-utils.ts | NOT a UI component (test harness). |
+
+## Pages
+
+Disposition of EVERY legacy page from
+`sneat-libs/libs/extensions/assetus/pages/src/lib/` against the MVP
+`ext-assetus` lib. None silently dropped.
+
+Verifies: assetus-frontend-port#ac:all-pages-accounted
+
+Ported pages follow the MVP convention: standalone Ionic components extending
+`@sneat/space-components` `SpaceBaseComponent` with `SpaceComponentBaseParams`
++ a `ClassName` provider, plain Ion-header titles (the legacy
+`SpacePageTitleComponent` is not exported by the installed
+`@sneat/space-components`), and routes wired in `assetus-routing.ts`.
+
+### Ported -> new path under `libs/ext-assetus/src/lib/pages/`
+
+| Legacy page | Ported to | Route | Notes |
+|---|---|---|---|
+| new-asset | `pages/new-asset/new-asset-page.component.ts` | `new-asset` | Category picker -> ported `AssetAddVehicle/Dwelling/Document` components. Legacy `@sneat/mod-assetus-core` `IAssetCategory` replaced with a local shape over the MVP `AssetCategory` ids (`vehicles`/`dwelling`/`document`). |
+| real-estates | `pages/real-estates/real-estates-page.component.ts` | `real-estates` | Properties list via the ported `AssetsListComponent` filtered to `assetType="dwelling"`. Legacy `AssetsBasePage`/`CommuneBasePageParams`/`IAssetService` plumbing replaced with `SpaceBaseComponent`; list does its own loading. |
+| real-estate | `pages/real-estate/real-estate-page.component.ts` | `real-estate/:assetID` | Property detail rendering the ported `RealEstateLocationComponent` + a static finance section. Asset context read from nav state. Landlord/tenant `asset-contacts-group` deferred (see below). |
+| asset-group | `pages/asset-group/asset-group-page.component.ts` | `asset-group` | Group detail via ported `PeriodSegmentComponent` + `AssetCardComponent`. Legacy injected the never-implemented `IAssetGroupService`/`IAssetService` stubs (the legacy file would not compile); those are dropped — group + assets are read from nav state. |
+| optimization | `pages/optimization/optimization-page.component.ts` | `optimization` | Savings suggestions page. Static demo card preserved; legacy `CommuneBasePage`/`CommuneTopPage` replaced with `SpaceBaseComponent`. |
+
+### Reconciled with existing MVP page (not re-ported)
+
+| Legacy page | MVP page | Notes |
+|---|---|---|
+| assets | `pages/assets/assets-page.component.ts` | MVP already implements the per-space assets list (live `watchAssets`, New-asset dialog, Active/Archived filter) against the unified `IAssetDbo`. The legacy `assets` page (+ its `AssetsBasePage`) is superseded. |
+| asset | `pages/asset/asset-page.component.ts` | MVP already implements asset detail/edit/archive/hard-delete/transfer/history against the unified `IAssetDbo`. The legacy `asset` page (+ `AssetBasePage`) is superseded. |
+
+### Shared base pages (accounted, not separately ported)
+
+| Legacy file | Disposition |
+|---|---|
+| assets-base.page.ts | Behaviour folded into the MVP `assets-page` (reconciled above). The `goNew(category)` navigation is reproduced inline by `real-estates-page`. Not re-ported as a base. |
+| asset-base.page.ts | Legacy `CommuneBasePage`-derived base for `asset`/`real-estate`. Behaviour folded into the MVP `asset-page` and the ported `real-estate-page`. Also the base for the deferred service-provider pages (see below). Not re-ported as a base. |
+
+### Deferred -> liabilities / service-provider sibling Feature (reason recorded)
+
+| Legacy page | Reason |
+|---|---|
+| liability/liability-new | Creates a liability (debt) record; belongs to the liabilities sibling Feature. Its service-provider internals are intentionally not ported. |
+| liability/select-service-provider | Service-provider picker built on the legacy `AssetBasePage` + `LiabilityServiceType` service-provider flow. Deferred to the liabilities/service-provider sibling. |
+| real-estate landlord/tenant contacts | The legacy `real-estate` page rendered `asset-contacts-group` (landlords/tenants) bound to `@sneat/contactus-core` `IContact2Asset`. That component is already deferred to the liabilities/service sibling (see Components section); the contact groups are therefore omitted from the ported `real-estate-page`. |
