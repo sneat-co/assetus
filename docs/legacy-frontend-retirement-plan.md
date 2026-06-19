@@ -26,9 +26,9 @@ Streams/subagents run concurrently and may share a filesystem/checkout. A stray 
    `git switch -c retire-legacy-assetus/<repo> origin/main` (e.g. `retire-legacy-assetus/sneat-apps`).
    The orchestrator keeps the `{repo → branch}` map and passes each subagent its **exact expected branch name**.
 
-2. **Prefer a dedicated git worktree per stream — strongest isolation.** A branch switch in one worktree never affects another:
-   `git worktree add ../wt-retire-<repo> -b retire-legacy-assetus/<repo> origin/main` and work inside it.
-   If driven by the **Workflow tool, use `isolation: 'worktree'` per agent** (it does this automatically). Any two streams that could touch the **same repo** (e.g. Phase 1 publish and Stream A self-decouple, both in `assetus`) MUST either be **serialized** or use **separate worktrees** — never run concurrently in one shared checkout.
+2. **Do NOT use git worktrees here — deliberate decision.** These are **nx/pnpm** workspaces: a fresh worktree has no `node_modules` (gitignored) and would force a `pnpm install` per worktree (slow, even with pnpm's store). And it buys nothing, because **this plan parallelizes BY REPO** — Streams A/B/C are already in *three different repo checkouts* (`assetus`, `sneat-libs`, `sneat-apps`), each with its own warm `node_modules` and independent branch. There is no shared working tree across streams to isolate. So: **one existing checkout per repo, one branch per repo (rule 1), guarded by rule 4.** Reuse the warm `node_modules`; do not reinstall.
+   - **The only same-repo overlap** is Phase 1 (publish, `assetus`) vs Stream A (self-decouple, `assetus`). These are **naturally serial** — Stream A can't repoint to the new lib until Phase 1 has published it — so **serialize them in the one `assetus` checkout**. Do NOT run them concurrently.
+   - **Worktree is a last resort only**, if you truly must have two concurrent writers in one repo: `git worktree add ../wt-retire-<repo> -b retire-legacy-assetus/<repo> origin/main` then `pnpm install` inside it (budget the reinstall). Prefer serializing over this.
 
 3. **Track edited files explicitly.** Maintain the exact list of paths this stream/subagent edits. **NEVER** stage with `git add -A`, `git add .`, or `git add -u`.
 
@@ -48,7 +48,7 @@ Streams/subagents run concurrently and may share a filesystem/checkout. A stray 
 
 5. **Never switch branches mid-work** in a shared (non-worktree) checkout, and **never force-push another stream's branch**. If you must read another branch, use `git show <branch>:<path>` — do not check it out.
 
-6. **One agent per repo at a time** (the §1 model). The orchestrator MUST NOT dispatch two agents that write to the same repo concurrently unless each is in its own worktree (rule 2).
+6. **One writer per repo at a time** (the §1 model). The orchestrator MUST NOT dispatch two agents that write to the same repo concurrently — **serialize them** (preferred), or, only if unavoidable, worktree-isolate one (rule 2, last resort). Different repos run freely in parallel since they are separate checkouts.
 
 ---
 
@@ -146,7 +146,7 @@ Run `nx run-many -t lint test build --projects=docus budgetus` (+ dependents) gr
 
 ## 7. Ready-to-use subagent prompts
 
-> Each Phase-2 agent works in ONE repo only, on its **own dedicated branch `retire-legacy-assetus/<repo>` created off `origin/main`** (ideally its own git worktree — §0.5 rule 2), stages **only its tracked files by explicit path** through the §0.5 pre-commit guard, opens its own PR, and must end with the repo's `nx run-many -t lint test build --coverage` green for the touched projects. Do not let two agents run nx — or write — in the same workspace concurrently. **§0 + §0.5 apply to every prompt below: zero functionality lost, ≥80% / no-coverage-regression, behaviour-parity + coverage evidence in the PR, dedicated branch/worktree, explicit-path staging, and the pre-commit branch+staged-files guard.** Each prompt below implicitly carries these — repeat them to the subagent, including its exact expected branch name.
+> Each Phase-2 agent works in ONE repo only, on its **own dedicated branch `retire-legacy-assetus/<repo>` created off `origin/main`** in that repo's **existing checkout (NOT a worktree — §0.5 rule 2; reuse the warm node_modules)**, stages **only its tracked files by explicit path** through the §0.5 pre-commit guard, opens its own PR, and must end with the repo's `nx run-many -t lint test build --coverage` green for the touched projects. Do not let two agents run nx — or write — in the same workspace concurrently. **§0 + §0.5 apply to every prompt below: zero functionality lost, ≥80% / no-coverage-regression, behaviour-parity + coverage evidence in the PR, dedicated branch/worktree, explicit-path staging, and the pre-commit branch+staged-files guard.** Each prompt below implicitly carries these — repeat them to the subagent, including its exact expected branch name.
 
 **Phase 1 (publish) — assetus:**
 > "In /Users/.../assetus/frontend, port the missing exports into `@sneat/extension-assetus` (libs/ext-assetus): context wrappers IAssetContext/IAssetDocumentContext/IAssetDwellingContext (from legacy sneat-libs/.../assetus/core/src/lib/contexts), carMakes/IMake/IModel (…/data/car-makes-with-models.ts), AssetGroup uimodel (…/uimodels/asset-group.ts) — reconcile with the new IAssetGroupInfo. Export everything the 5 consumers in docs/legacy-frontend-retirement-plan.md §3 need from the lib's index.ts. Verify `npx nx run-many -t lint test build --projects=ext-assetus` is green. Then publish a new lib version per the repo's release process. Stage; open a PR. Report the new version + the exported symbol list."
