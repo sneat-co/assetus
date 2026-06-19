@@ -15,7 +15,7 @@ import { AssetPossessionCardComponent } from '../asset-possession-card/asset-pos
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-edit-dwelling-card',
+  selector: 'assetus-edit-dwelling-card',
   templateUrl: './edit-dwelling-card.component.html',
   imports: [
     FormsModule,

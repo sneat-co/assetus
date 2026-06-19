@@ -29,7 +29,7 @@ import { VehicleEngineComponent } from '../vehicle-engine/vehicle-engine.compone
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-vehicle-card',
+  selector: 'assetus-vehicle-card',
   templateUrl: './vehicle-card.component.html',
   imports: [
     FormsModule,

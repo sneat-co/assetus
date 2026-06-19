@@ -213,7 +213,7 @@ describe('enum unions admit every backend value', () => {
   it('fuel-volume unit / mileage unit / currency are open strings', () => {
     const vol: FuelVolumeUnit = 'gallons-or-anything';
     const mileage: MileageUnit = 'nautical-mile';
-    const currency: string = 'XYZ';
+    const currency = 'XYZ';
     expect(typeof vol).toBe('string');
     expect(typeof mileage).toBe('string');
     expect(typeof currency).toBe('string');

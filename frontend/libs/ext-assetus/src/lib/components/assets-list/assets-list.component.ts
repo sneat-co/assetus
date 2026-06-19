@@ -25,7 +25,7 @@ import { MileAgeDialogComponent } from '../mileage-dialog/mileage-dialog.compone
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-assets-list',
+  selector: 'assetus-assets-list',
   templateUrl: './assets-list.component.html',
   providers: [ModalController],
   imports: [

@@ -21,7 +21,7 @@ interface AssetDate {
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-asset-dates',
+  selector: 'assetus-asset-dates',
   templateUrl: './asset-dates.component.html',
   imports: [
     FormsModule,

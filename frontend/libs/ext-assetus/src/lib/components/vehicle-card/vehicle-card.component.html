@@ -8,7 +8,7 @@
       (countryIDChange)="countryChanged($event)"
     />
     @if (vehicleAsset?.dbo?.countryID) {
-      <sneat-asset-reg-number
+      <assetus-asset-reg-number
         [space]="space"
         [assetID]="vehicleAsset?.id"
         [regNumber]="vehicleAsset?.dbo?.extra?.regNumber"
@@ -29,7 +29,7 @@
       vehicleAsset?.dbo?.countryID &&
       (regNumberSkipped || !!vehicleAsset?.dbo?.extra?.regNumber))
   ) {
-    <sneat-make-model-card
+    <assetus-make-model-card
       [assetType]="vehicleAsset?.dbo?.type"
       [make]="vehicleAsset?.dbo?.extra?.make"
       [model]="vehicleAsset?.dbo?.extra?.model"
@@ -41,7 +41,7 @@
     <ion-item-divider>
       <ion-label>Engine</ion-label>
     </ion-item-divider>
-    <sneat-vehicle-engine
+    <assetus-vehicle-engine
       [vehicleAsset]="vehicleAsset"
       (vehicleAssetChange)="onAssetChanged($event)"
     />
@@ -49,7 +49,7 @@
 </ion-card>
 
 @if (vehicleAsset?.dbo?.extra?.model) {
-  <sneat-asset-possession-card
+  <assetus-asset-possession-card
     [asset]="vehicleAsset"
     (assetChange)="onAssetChanged($event)"
   />

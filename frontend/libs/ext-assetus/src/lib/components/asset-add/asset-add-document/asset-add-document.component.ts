@@ -28,7 +28,7 @@ import {
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-asset-add-document',
+  selector: 'assetus-asset-add-document',
   templateUrl: './asset-add-document.component.html',
   providers: [
     {

@@ -13,7 +13,7 @@ import { IAssetContext } from '@sneat/mod-assetus-core';
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-asset-card',
+  selector: 'assetus-asset-card',
   templateUrl: './asset-card.component.html',
   imports: [
     RouterModule,

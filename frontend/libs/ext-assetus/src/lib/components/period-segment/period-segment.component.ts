@@ -8,7 +8,7 @@ import { Period } from '@sneat/dto';
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-period-segment',
+  selector: 'assetus-period-segment',
   templateUrl: './period-segment.component.html',
   imports: [IonSegment, IonSegmentButton, IonLabel],
 })

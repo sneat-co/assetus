@@ -15,7 +15,7 @@ import {
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-vehicle-engine',
+  selector: 'assetus-vehicle-engine',
   templateUrl: './vehicle-engine.component.html',
   imports: [SelectFromListComponent, IonItemGroup, IonItem, IonInput],
 })

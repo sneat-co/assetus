@@ -45,7 +45,7 @@ describe('NewAssetPageComponent', () => {
     fixture.detectChanges();
     const host = fixture.nativeElement as HTMLElement;
     // The category picker list is gone; the vehicle add host is rendered.
-    expect(host.querySelector('sneat-asset-add-vehicle')).toBeTruthy();
+    expect(host.querySelector('assetus-asset-add-vehicle')).toBeTruthy();
     expect(host.textContent).not.toContain('Select asset kind');
   });
 
@@ -57,6 +57,6 @@ describe('NewAssetPageComponent', () => {
     fixture.componentInstance.selectCategory(dwelling as never);
     fixture.detectChanges();
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.querySelector('sneat-asset-add-dwelling')).toBeTruthy();
+    expect(host.querySelector('assetus-asset-add-dwelling')).toBeTruthy();
   });
 });

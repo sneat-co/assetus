@@ -25,7 +25,7 @@ import { ISpaceContext } from '@sneat/space-models';
 // The legacy AssetService/IUpdateAssetRequest are consumed from the published
 // sibling lib (their request contract differs from the MVP AssetService).
 @Component({
-  selector: 'sneat-asset-reg-number',
+  selector: 'assetus-asset-reg-number',
   templateUrl: 'asset-reg-number-input.component.html',
   imports: [
     ReactiveFormsModule,

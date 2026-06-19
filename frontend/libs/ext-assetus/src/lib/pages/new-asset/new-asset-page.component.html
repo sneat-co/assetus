@@ -30,13 +30,13 @@
   } @else {
     @switch (category()?.id) {
       @case ("vehicles") {
-        <sneat-asset-add-vehicle />
+        <assetus-asset-add-vehicle />
       }
       @case ("dwelling") {
-        <sneat-asset-add-dwelling />
+        <assetus-asset-add-dwelling />
       }
       @case ("document") {
-        <sneat-asset-add-document />
+        <assetus-asset-add-document />
       }
       @default {
         unknown category {{ category()?.id }}

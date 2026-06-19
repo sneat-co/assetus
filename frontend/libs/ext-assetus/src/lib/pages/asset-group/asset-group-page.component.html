@@ -28,11 +28,11 @@
 
 <ion-content class="cardy">
   <div class="segment">
-    <sneat-period-segment [period]="period" (changed)="periodChanged($event)" />
+    <assetus-period-segment [period]="period" (changed)="periodChanged($event)" />
   </div>
   @if (assets) {
     @for (asset of assets; track asset.id) {
-      <sneat-asset-card [asset]="asset" [period]="period" />
+      <assetus-asset-card [asset]="asset" [period]="period" />
     }
   }
 </ion-content>

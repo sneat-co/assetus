@@ -18,7 +18,7 @@ import { AddDwellingCardComponent } from '../../edit-dwelling-card/edit-dwelling
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-asset-add-dwelling',
+  selector: 'assetus-asset-add-dwelling',
   templateUrl: './asset-add-dwelling.component.html',
   providers: [
     {

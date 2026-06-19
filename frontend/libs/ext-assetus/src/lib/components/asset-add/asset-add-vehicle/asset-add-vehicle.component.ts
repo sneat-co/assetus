@@ -24,7 +24,7 @@ import { ClassName } from '@sneat/ui';
 // Extends the published legacy AddAssetBaseComponent (its createAsset<Extra>
 // flow differs from the MVP AssetService).
 @Component({
-  selector: 'sneat-asset-add-vehicle',
+  selector: 'assetus-asset-add-vehicle',
   templateUrl: './asset-add-vehicle.component.html',
   providers: [
     {

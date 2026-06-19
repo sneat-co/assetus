@@ -10,7 +10,7 @@ import {
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-asset-possession-card',
+  selector: 'assetus-asset-possession-card',
   templateUrl: './asset-possession-card.component.html',
   imports: [FormsModule, SelectFromListComponent, IonCard, IonItem, IonLabel],
 })

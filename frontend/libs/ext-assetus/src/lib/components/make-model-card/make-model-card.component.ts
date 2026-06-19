@@ -12,7 +12,7 @@ import { AssetType, carMakes, IMake, IModel } from '@sneat/mod-assetus-core';
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-make-model-card',
+  selector: 'assetus-make-model-card',
   templateUrl: './make-model-card.component.html',
   imports: [SelectFromListComponent, FormsModule, IonItem, IonInput],
 })

@@ -32,7 +32,7 @@ import { ISpaceBrief } from '@sneat/dto';
 
 // Ported from @sneat/ext-assetus-components (legacy assetus components lib).
 @Component({
-  selector: 'sneat-mileage-dialog',
+  selector: 'assetus-mileage-dialog',
   templateUrl: './mileage-dialog.component.html',
   styleUrls: ['./mileage-dialog.component.scss'],
   imports: [
