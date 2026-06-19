@@ -7,6 +7,17 @@
 
 ---
 
+## 0. Non-negotiable requirements (apply to EVERY phase, stream, and PR)
+
+These are **hard gates**. A stream is not done — and its PR must not merge — unless all hold. Do not relax them; surface a blocker instead.
+
+1. **ZERO FUNCTIONALITY LOST.** Every capability, field, behaviour, and rendered output of each migrated consumer MUST be preserved exactly. Migration is a *repoint of imports*, not a feature change: do not drop, rename, or simplify any behaviour. For each migrated symbol (`IAssetContext`, `IAssetDocumentContext`, `AssetService`, `AssetGroup`, etc.), verify the new lib's equivalent is a **superset or exact match** of what the consumer used; if the new lib is missing anything the consumer relied on, **add it to the new lib (Phase 1)** rather than degrade the consumer. Any unavoidable behaviour change is a blocker for human decision, not a silent cut.
+2. **GOOD TEST COVERAGE — no regression, ≥80%.** Every touched project MUST keep (or improve) its statement coverage, and MUST NOT drop below **80%**. `@sneat/extension-assetus` (ext-assetus) is at ~82% — keep it ≥80%. Any code newly **ported into the new lib in Phase 1** (context wrappers, `carMakes`, `AssetGroup`, service surface) MUST ship with tests. Migrated consumers MUST retain their existing tests passing; where a consumer had behaviour tests tied to the legacy import, port/adapt them — do not delete tests to make the build green.
+3. **Evidence, not assertion.** Each PR must show: `nx run-many -t lint test build` green for the touched projects **with `--coverage`**, the measured coverage number(s), and a one-line behaviour-parity note per migrated consumer. "Build passes" alone is insufficient — coverage and parity must be demonstrated.
+4. **Verify against the actual legacy code**, not assumptions — read the legacy symbol definitions in `sneat-libs/libs/extensions/assetus` and confirm the new lib matches, exactly as the original unification was reviewed.
+
+---
+
 ## 1. Execution model (read first)
 
 This is a **pipeline with barriers**, not a flat fan-out. There is a serial gate at the front and a serial barrier at the end; only the middle parallelizes.
@@ -101,7 +112,7 @@ Run `nx run-many -t lint test build --projects=docus budgetus` (+ dependents) gr
 
 ## 7. Ready-to-use subagent prompts
 
-> Each Phase-2 agent works in ONE repo only, stages with `git add`, opens its own PR, and must end with the repo's `nx run-many -t lint test build` green for the touched projects. Do not let two agents run nx in the same workspace concurrently.
+> Each Phase-2 agent works in ONE repo only, stages with `git add`, opens its own PR, and must end with the repo's `nx run-many -t lint test build --coverage` green for the touched projects. Do not let two agents run nx in the same workspace concurrently. **§0 applies to every prompt below: zero functionality lost, ≥80% / no-coverage-regression, and a behaviour-parity note + coverage number in the PR.** Each prompt below implicitly carries these — repeat them to the subagent.
 
 **Phase 1 (publish) — assetus:**
 > "In /Users/.../assetus/frontend, port the missing exports into `@sneat/extension-assetus` (libs/ext-assetus): context wrappers IAssetContext/IAssetDocumentContext/IAssetDwellingContext (from legacy sneat-libs/.../assetus/core/src/lib/contexts), carMakes/IMake/IModel (…/data/car-makes-with-models.ts), AssetGroup uimodel (…/uimodels/asset-group.ts) — reconcile with the new IAssetGroupInfo. Export everything the 5 consumers in docs/legacy-frontend-retirement-plan.md §3 need from the lib's index.ts. Verify `npx nx run-many -t lint test build --projects=ext-assetus` is green. Then publish a new lib version per the repo's release process. Stage; open a PR. Report the new version + the exported symbol list."
@@ -120,7 +131,9 @@ Run `nx run-many -t lint test build --projects=docus budgetus` (+ dependents) gr
 
 ## 8. Definition of done
 
+- **Zero functionality lost** — every migrated consumer behaves exactly as before (§0.1); any behaviour change was surfaced and approved, not silently cut.
+- **Coverage held** — every touched project ≥80% statement coverage with no regression; newly-ported lib code ships with tests (§0.2).
 - All 5 consumers import only `@sneat/extension-assetus` (or no assetus).
 - `sneat-libs/libs/extensions/assetus` and `sneat-apps/libs/extensions/assetus` **deleted**.
-- All affected projects build/lint/test green in CI.
+- All affected projects build/lint/test green in CI, with coverage evidence in each PR.
 - Issue sneat-co/assetus#4 closed.
