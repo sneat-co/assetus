@@ -11,6 +11,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IAssetDbo } from '../dto';
 import {
+  ICreateVehicleRecordRequest,
+  ICreateVehicleRecordResponse,
   IAssetHistoryResponse,
   IAssetResponse,
   ICreateAssetRequest,
@@ -95,6 +97,15 @@ export class AssetService {
     return this.sneatApiService.get<IAssetHistoryResponse>(
       api('asset_history'),
       params,
+    );
+  }
+
+  public addVehicleRecord(
+    request: ICreateVehicleRecordRequest,
+  ): Observable<ICreateVehicleRecordResponse> {
+    return this.sneatApiService.post<ICreateVehicleRecordResponse>(
+      api('create_vehicle_record'),
+      request,
     );
   }
 

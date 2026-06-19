@@ -3,6 +3,7 @@ import {
   AssetCondition,
   AssetVisibility,
   HistoryEventType,
+  IAddVehicleRecordRequest as IAddVehicleRecord,
   IAssetDbo,
   IHistoryEvent,
   IMoney,
@@ -76,4 +77,15 @@ export interface IRecordHistoryEventRequest {
 export interface IAssetHistoryResponse {
   assetID: string;
   events: IHistoryEvent[];
+}
+
+// Appends a vehicle record (mileage and/or fuel reading) to a vehicle asset.
+// The flat record shape (IAddVehicleRecord, from the dto) plus the spaceID
+// required by the backend's embedded SpaceRequest.
+export interface ICreateVehicleRecordRequest extends IAddVehicleRecord {
+  spaceID: string;
+}
+
+export interface ICreateVehicleRecordResponse {
+  id: string;
 }
