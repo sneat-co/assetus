@@ -16,6 +16,10 @@ import (
 type Status string
 
 const (
+	// StatusDraft is the pre-active lifecycle state ported from the legacy
+	// AssetStatus set ({active, archived, draft}). An asset starts as a draft
+	// before it is activated.
+	StatusDraft       Status = "draft"
 	StatusActive      Status = "active"
 	StatusTransferred Status = "transferred"
 	StatusArchived    Status = "archived"
@@ -23,8 +27,12 @@ const (
 	StatusLost        Status = "lost"
 )
 
-// Statuses is the closed set of valid ownership-lifecycle statuses.
+// Statuses is the closed set of valid ownership-lifecycle statuses. It is the
+// exact union of the legacy AssetStatus set {active, archived, draft} and the
+// MVP Status set {active, transferred, archived, disposed, lost}, i.e.
+// {draft, active, transferred, archived, disposed, lost}.
 var Statuses = []Status{
+	StatusDraft,
 	StatusActive,
 	StatusTransferred,
 	StatusArchived,

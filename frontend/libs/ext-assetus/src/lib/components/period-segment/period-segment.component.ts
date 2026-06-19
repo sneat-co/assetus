@@ -1,0 +1,25 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  IonLabel,
+  IonSegment,
+  IonSegmentButton,
+} from '@ionic/angular/standalone';
+import { Period } from '@sneat/dto';
+
+// Ported from @sneat/ext-assetus-components (legacy assetus components lib).
+@Component({
+  selector: 'assetus-period-segment',
+  templateUrl: './period-segment.component.html',
+  imports: [IonSegment, IonSegmentButton, IonLabel],
+})
+export class PeriodSegmentComponent {
+  @Input()
+  public period?: Period;
+
+  @Output() changed = new EventEmitter<Period>();
+
+  segmentChanged(ev: CustomEvent): void {
+    this.period = ev.detail.value;
+    this.changed.emit(this.period);
+  }
+}

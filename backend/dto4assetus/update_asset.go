@@ -4,9 +4,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/crediterra/money"
 	"github.com/sneat-co/assetus/backend/const4assetus"
 	"github.com/sneat-co/assetus/backend/dbo4assetus"
+	"github.com/sneat-co/sneat-core-modules/core/extra"
 	"github.com/sneat-co/sneat-core-modules/spaceus/dto4spaceus"
+	"github.com/sneat-co/sneat-go-core/geo"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/strongo/validation"
 )
 
@@ -30,6 +34,37 @@ type UpdateAssetRequest struct {
 	Tags            []string                    `json:"tags,omitempty"`
 	PurchasePrice   *dbo4assetus.MonetaryAmount `json:"purchasePrice,omitempty"`
 	EstimatedValue  *dbo4assetus.MonetaryAmount `json:"estimatedValue,omitempty"`
+
+	// --- Optional unified (superset) editable fields, full-replacement ----
+	Type             const4assetus.Type       `json:"type,omitempty"`
+	Possession       const4assetus.Possession `json:"possession,omitempty"`
+	CountryID        geo.CountryAlpha2        `json:"countryID,omitempty"`
+	ParentCategoryID const4assetus.Category   `json:"parentCategoryID,omitempty"`
+	YearOfBuild      *int                     `json:"yearOfBuild,omitempty"`
+	IsRequest        bool                     `json:"isRequest,omitempty"`
+	Geo              *dbo4assetus.GeoPoint    `json:"geo,omitempty"`
+
+	// AssetDates (dateOfBuild/dateOfPurchase/dateInsuredTill/dateCertifiedTill).
+	dbo4assetus.AssetDates
+
+	// Custom fields (fieldsStr/fieldsInt/fieldsDate/fieldsAmount).
+	dbmodels.WithCustomFields
+
+	// Financial.
+	Totals              []money.Amount                     `json:"totals,omitempty"`
+	CanHaveIncome       bool                               `json:"canHaveIncome,omitempty"`
+	CanHaveExpense      bool                               `json:"canHaveExpense,omitempty"`
+	FinancialDirection  string                             `json:"financialDirection,omitempty"`
+	Liabilities         []dbo4assetus.AssetLiabilityInfo   `json:"liabilities,omitempty"`
+	NotUsedServiceTypes []dbo4assetus.LiabilityServiceType `json:"notUsedServiceTypes,omitempty"`
+
+	// Relationships (groupID/group/parentAssetID/subAssets/sameAssetID/
+	// relatedAs/memberIDs/membersInfo).
+	dbo4assetus.WithAssetRelationships
+
+	// The OPTIONAL polymorphic typed extra (vehicle/dwelling/document),
+	// accepted via the same extraType + extra shape carried by the record.
+	extra.WithExtraField
 }
 
 // Validate validates the request.

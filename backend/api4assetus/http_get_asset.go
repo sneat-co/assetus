@@ -17,8 +17,12 @@ func httpGetAsset(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	request := dto4assetus.GetAssetRequest{AssetID: query.Get("assetID")}
 	request.SpaceID = coretypes.SpaceID(query.Get("spaceID"))
-	ctx, err := apicore.VerifyAuthenticatedRequestAndDecodeBody(w, r, verify.DefaultJsonWithAuthRequired, &request)
+	ctx, err := apicore.VerifyRequestAndCreateUserContext(w, r, verify.Request(verify.AuthenticationRequired(true)))
 	if err != nil {
+		return
+	}
+	if err = request.Validate(); err != nil {
+		apicore.ReturnError(ctx, w, r, err)
 		return
 	}
 	response, err := getAsset(ctx, request)

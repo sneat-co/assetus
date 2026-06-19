@@ -43,7 +43,8 @@
     "test": {
       "executor": "@nx/angular:unit-test",
       "options": {
-        "watch": false
+        "watch": false,
+        "runnerConfig": "libs/ext-assetus/vitest.config.ts"
       }
     },
     "lint": {

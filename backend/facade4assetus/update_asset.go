@@ -39,6 +39,26 @@ func UpdateAsset(ctx facade.ContextWithUser, request dto4assetus.UpdateAssetRequ
 			asset.Location = request.Location
 			asset.Notes = request.Notes
 			asset.Tags = request.Tags
+
+			// Full replacement of the unified (superset) editable set.
+			asset.Type = request.Type
+			asset.Possession = request.Possession
+			asset.CountryID = request.CountryID
+			asset.ParentCategoryID = request.ParentCategoryID
+			asset.YearOfBuild = request.YearOfBuild
+			asset.IsRequest = request.IsRequest
+			asset.Geo = request.Geo
+			asset.AssetDates = request.AssetDates
+			asset.WithCustomFields = request.WithCustomFields
+			asset.Totals = request.Totals
+			asset.CanHaveIncome = request.CanHaveIncome
+			asset.CanHaveExpense = request.CanHaveExpense
+			asset.FinancialDirection = request.FinancialDirection
+			asset.Liabilities = request.Liabilities
+			asset.NotUsedServiceTypes = request.NotUsedServiceTypes
+			asset.WithAssetRelationships = request.WithAssetRelationships
+			asset.WithExtraField = request.WithExtraField
+
 			asset.UpdatedAt = params.Started
 			asset.UpdatedBy = params.UserID()
 

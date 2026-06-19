@@ -1,0 +1,22 @@
+<ion-card
+  tappable
+  [routerLink]="'/asset/' + asset?.id"
+  routerDirection="forward"
+>
+  <ion-card-header>
+    <ion-card-title>
+      {{ asset?.dbo?.title }}
+    </ion-card-title>
+  </ion-card-header>
+  @if (asset?.dbo?.subAssets) {
+    <ion-card-content>
+      @for (subAsset of asset?.dbo?.subAssets || []; track subAsset.id) {
+        <ion-item>
+          <ion-label>
+            <h3>{{ subAsset.title }}</h3>
+          </ion-label>
+        </ion-item>
+      }
+    </ion-card-content>
+  }
+</ion-card>
