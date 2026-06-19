@@ -1,11 +1,16 @@
 package facade4assetus
 
 import (
+	"context"
 	"errors"
 	"testing"
 
 	"github.com/sneat-co/assetus/backend/const4assetus"
+	"github.com/sneat-co/assetus/backend/dal4assetus"
+	"github.com/sneat-co/assetus/backend/dbo4assetus"
 	"github.com/sneat-co/assetus/backend/dto4assetus"
+	"github.com/sneat-co/assetus/backend/extras4assetus"
+	"github.com/sneat-co/sneat-core-modules/core/extra"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
 )
@@ -82,6 +87,83 @@ func TestUpdateAsset_ConditionUpdated(t *testing.T) {
 	}
 	if resp.Asset.Condition != const4assetus.ConditionNeedsRepair {
 		t.Errorf("condition = %q, want needs_repair", resp.Asset.Condition)
+	}
+}
+
+// AC: optional-legacy-fields-roundtrip (update) — an update sets/replaces the
+// rich editable unified fields (incl. a vehicle extra); they persist, the
+// ownership-lifecycle status is preserved, and the history is NOT altered.
+func TestUpdateAsset_RichFieldsReplacedHistoryUnchanged(t *testing.T) {
+	const spaceID coretypes.SpaceID = "family1"
+	db := newTestDBWithSpace(t, spaceID, coretypes.SpaceTypeFamily, testUserID)
+	id := seedAsset(t, spaceID)
+
+	before, err := GetHistory(userCtx(testUserID), dto4assetus.GetHistoryRequest{SpaceRequest: spaceRequest(spaceID), AssetID: id})
+	if err != nil {
+		t.Fatalf("GetHistory before failed: %v", err)
+	}
+
+	var ef extra.WithExtraField
+	if err = ef.SetExtra(extras4assetus.AssetExtraTypeVehicle, &extras4assetus.AssetVehicleExtra{
+		WithMakeModelRegNumberFields: extras4assetus.WithMakeModelRegNumberFields{
+			WithMakeModelFields: extras4assetus.WithMakeModelFields{Make: "Tesla", Model: "Model 3"},
+		},
+		Vin: "1HGCM82633A004352",
+		WithEngineData: extras4assetus.WithEngineData{
+			EngineType: const4assetus.EngineTypeElectric,
+		},
+	}); err != nil {
+		t.Fatalf("SetExtra failed: %v", err)
+	}
+
+	year := 2021
+	resp, err := UpdateAsset(userCtx(testUserID), dto4assetus.UpdateAssetRequest{
+		SpaceRequest: spaceRequest(spaceID),
+		AssetID:      id,
+		Name:         "Updated Car",
+		Category:     const4assetus.CategoryVehicles,
+		Condition:    const4assetus.ConditionGood,
+		Visibility:   const4assetus.VisibilityFamily,
+		Type:         const4assetus.TypeVehicleCar,
+		Possession:   const4assetus.PossessionRenting,
+		CountryID:    "IE",
+		YearOfBuild:  &year,
+		Geo:          &dbo4assetus.GeoPoint{Lat: 1, Lng: 2},
+		WithAssetRelationships: dbo4assetus.WithAssetRelationships{
+			SameAssetID: "same-1",
+		},
+		WithExtraField: ef,
+	})
+	if err != nil {
+		t.Fatalf("UpdateAsset failed: %v", err)
+	}
+	if resp.Asset.Type != const4assetus.TypeVehicleCar || resp.Asset.Possession != const4assetus.PossessionRenting {
+		t.Errorf("rich fields not applied: type=%q possession=%q", resp.Asset.Type, resp.Asset.Possession)
+	}
+	// Status preserved from the seeded asset (active).
+	if resp.Asset.Status != const4assetus.StatusActive {
+		t.Errorf("status = %q, want active (preserved)", resp.Asset.Status)
+	}
+
+	// Re-read to confirm persistence and round-trip of the extra.
+	asset := dal4assetus.NewAssetEntry(spaceID, id)
+	if err = db.Get(context.Background(), asset.Record); err != nil {
+		t.Fatalf("failed to read updated asset: %v", err)
+	}
+	if asset.Data.SameAssetID != "same-1" {
+		t.Errorf("sameAssetID = %q, want same-1", asset.Data.SameAssetID)
+	}
+	if asset.Data.ExtraType != extras4assetus.AssetExtraTypeVehicle {
+		t.Errorf("extraType = %q, want vehicle", asset.Data.ExtraType)
+	}
+
+	// History unchanged by the edit.
+	after, err := GetHistory(userCtx(testUserID), dto4assetus.GetHistoryRequest{SpaceRequest: spaceRequest(spaceID), AssetID: id})
+	if err != nil {
+		t.Fatalf("GetHistory after failed: %v", err)
+	}
+	if len(after.Events) != len(before.Events) {
+		t.Errorf("history length changed by edit: before=%d after=%d", len(before.Events), len(after.Events))
 	}
 }
 

@@ -36,6 +36,20 @@ func TestCreateAssetRequest_Validate(t *testing.T) {
 	if err := noSpace.Validate(); err == nil {
 		t.Error("expected missing-spaceID rejection")
 	}
+
+	// Status is OPTIONAL on create: a valid status (draft) is accepted.
+	draft := valid
+	draft.Status = const4assetus.StatusDraft
+	if err := draft.Validate(); err != nil {
+		t.Errorf("draft status rejected: %v", err)
+	}
+
+	// An invalid status is rejected when supplied.
+	badStatus := valid
+	badStatus.Status = "borrowed"
+	if err := badStatus.Validate(); err == nil {
+		t.Error("expected invalid-status rejection")
+	}
 }
 
 func TestUpdateAssetRequest_Validate(t *testing.T) {

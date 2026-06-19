@@ -10,6 +10,7 @@ import (
 	"github.com/sneat-co/assetus/backend/dal4assetus"
 	"github.com/sneat-co/assetus/backend/dbo4assetus"
 	"github.com/sneat-co/assetus/backend/dto4assetus"
+	_ "github.com/sneat-co/assetus/backend/extras4assetus" // register typed-extra factories
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/facade"
 )
@@ -39,13 +40,18 @@ func CreateAsset(ctx facade.ContextWithUser, request dto4assetus.CreateAssetRequ
 			now := params.Started
 			userID := params.UserID()
 
+			status := request.Status
+			if status == "" {
+				status = const4assetus.StatusActive
+			}
+
 			asset := params.Asset.Data
 			asset.AssetBase = dbo4assetus.AssetBase{
 				Name:            request.Name,
 				Description:     request.Description,
 				Category:        request.Category,
 				Condition:       request.Condition,
-				Status:          const4assetus.StatusActive,
+				Status:          status,
 				Visibility:      visibility,
 				AcquisitionDate: request.AcquisitionDate,
 				PurchasePrice:   request.PurchasePrice,
@@ -53,6 +59,26 @@ func CreateAsset(ctx facade.ContextWithUser, request dto4assetus.CreateAssetRequ
 				Location:        request.Location,
 				Notes:           request.Notes,
 				Tags:            request.Tags,
+
+				// Unified (superset) optional fields.
+				Type:                request.Type,
+				Possession:          request.Possession,
+				CountryID:           request.CountryID,
+				ParentCategoryID:    request.ParentCategoryID,
+				YearOfBuild:         request.YearOfBuild,
+				IsRequest:           request.IsRequest,
+				Geo:                 request.Geo,
+				AssetDates:          request.AssetDates,
+				WithCustomFields:    request.WithCustomFields,
+				Totals:              request.Totals,
+				CanHaveIncome:       request.CanHaveIncome,
+				CanHaveExpense:      request.CanHaveExpense,
+				FinancialDirection:  request.FinancialDirection,
+				Liabilities:         request.Liabilities,
+				NotUsedServiceTypes: request.NotUsedServiceTypes,
+
+				WithAssetRelationships: request.WithAssetRelationships,
+				WithExtraField:         request.WithExtraField,
 			}
 			asset.SpaceIDs = []coretypes.SpaceID{request.SpaceID}
 			asset.CreatedAt = now

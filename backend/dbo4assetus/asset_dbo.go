@@ -7,6 +7,7 @@ import (
 
 	"github.com/crediterra/money"
 	"github.com/sneat-co/assetus/backend/const4assetus"
+	"github.com/sneat-co/sneat-core-modules/core/extra"
 	"github.com/sneat-co/sneat-go-core/geo"
 	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/validate"
@@ -176,6 +177,11 @@ type AssetBase struct {
 	// sub-asset nesting, asset linking (sameAssetID/relatedAs) and per-asset
 	// member info ported from the legacy AssetBrief/AssetDbo and frontend DTO.
 	WithAssetRelationships
+
+	// WithExtraField carries the OPTIONAL polymorphic typed extra (vehicle/
+	// dwelling/document) resolved by extraType. An asset with no extra
+	// (empty extraType) stays valid.
+	extra.WithExtraField
 }
 
 // WithPossessionDefault returns the asset's Possession, defaulting to
@@ -257,6 +263,12 @@ func (v AssetBase) Validate() error {
 	}
 	if err := v.WithAssetRelationships.Validate(); err != nil {
 		return err
+	}
+	// The typed extra is optional: validate it only when an extraType is set.
+	if v.ExtraType != "" {
+		if err := v.WithExtraField.Validate(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
