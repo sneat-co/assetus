@@ -255,6 +255,7 @@ All ACs are testable (Go unit tests + build/test commands), but Rehearse stub fi
 
 ## Open Questions
 
+- **Financial dimension home (kept in core for now — revisit).** Per-asset/group totals (`ITotalsHolder`), `canHaveIncome`/`canHaveExpense`, income/expense direction, the `debt` category, and asset-side liability linkage currently live as **optional fields on the unified core asset** per REQ:financial-dimension-disposition (owner decision). This is retained as-is, but flagged as an open question: should the financial dimension eventually move out of the ownership core into the **liabilities/financial sibling Feature** (closer to Debtus), to keep the asset record focused on ownership? No functionality is at risk either way — this is a bounded-context placement decision to revisit when the liabilities sibling Feature is specified.
 - **Tasks-module reminder integration (sibling Feature, not a cut).** The legacy vehicle NCT/tax/service due-date links pointed into a tasks module. This Feature preserves the **due-date values** on the `vehicle` extra (REQ:vehicle-extra-complete), so no data is lost; whether to re-wire them as live task reminders into a tasks module is deferred to a separate sibling Feature once that integration target is confirmed to exist.
 - **`yearOfBuild` vs `dateOfBuild`.** Legacy carries both (with a TODO to consolidate). Preserve both, or consolidate to `dateOfBuild` on migration? Spec preserves both by default.
 
