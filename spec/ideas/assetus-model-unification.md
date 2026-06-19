@@ -8,7 +8,7 @@ status: Specified
 **Status:** Specified
 **Date:** 2026-06-18
 **Owner:** alex
-**Promotes To:** unified-assetus-data-model
+**Promotes To:** assetus-frontend-port, unified-assetus-data-model
 **Supersedes:** —
 **Related Ideas:** —
 
