@@ -18,6 +18,14 @@ export const assetusRoutes: Route[] = [
       ),
   },
   {
+    path: 'asset/:assetID/edit',
+    data: { title: 'Edit asset' },
+    loadComponent: () =>
+      import('./pages/asset-edit/asset-edit-page.component').then(
+        (m) => m.AssetEditPageComponent,
+      ),
+  },
+  {
     path: 'new-asset',
     data: { title: 'New asset' },
     loadComponent: () =>
