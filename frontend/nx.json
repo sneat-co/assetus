@@ -60,7 +60,7 @@
     }
   },
   "release": {
-    "projects": ["api", "ext-assetus"],
+    "projects": ["api"],
     "projectsRelationship": "independent",
     "docker": {
       "skipVersionActions": true

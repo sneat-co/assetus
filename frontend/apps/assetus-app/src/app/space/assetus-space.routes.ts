@@ -2,7 +2,7 @@ import { Route } from '@angular/router';
 import {
   assetusRoutes,
   AssetusSpaceMenuComponent,
-} from '@sneat/extension-assetus';
+} from '@sneat/extension-assetus-shared';
 import { SpaceComponentBaseParams } from '@sneat/space-components';
 
 // Thin, assetus-only space shell. It provides SpaceComponentBaseParams (which

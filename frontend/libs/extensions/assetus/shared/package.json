@@ -5,7 +5,28 @@
     "access": "public"
   },
   "peerDependencies": {
-    "vitest": "^4.0.9"
+    "vitest": "^4.0.9",
+    "@angular/router": "21.2.9",
+    "@angular/core": "21.2.9",
+    "@angular/forms": "21.2.9",
+    "@sneat/space-models": "0.9.0",
+    "@sneat/space-components": "0.9.0",
+    "@sneat/extension-assetus-contract": "0.0.5",
+    "@ionic/angular": "8.8.6",
+    "@sneat/ui": "0.9.0",
+    "@sneat/dto": "0.9.0",
+    "date-fns": "4.1.0",
+    "@sneat/core": "0.9.0",
+    "@sneat/space-services": "0.9.0",
+    "@sneat/components": "0.9.0",
+    "rxjs": "~7.8.0",
+    "@sneat/contactus-services": "0.9.0",
+    "@sneat/auth-models": "0.9.0",
+    "@sneat/auth-core": "0.9.0",
+    "@angular/common": "21.2.9",
+    "@sneat/auth-ui": "0.9.0",
+    "@sneat/app": "0.9.0",
+    "@sneat/logging": "0.9.0"
   },
   "sideEffects": false
 }

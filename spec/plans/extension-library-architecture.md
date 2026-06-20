@@ -60,7 +60,7 @@ Move `AssetService` and `assetus-core-services.module.ts` into `extension-assetu
 
 **Source:** idea:adopt-extension-library-architecture
 **Depends-On:** 3
-**Status:** pending
+**Status:** done
 
 Move the app-facing routing, pages (9 page groups), the ~28 components, and `space-menu` into `extension-assetus-shared`, refactoring `AssetService` access to inject `ASSET_SERVICE` (zero `-internal` imports). Drop the now-empty `ext-assetus` lib (or repurpose it) once content has migrated.
 
