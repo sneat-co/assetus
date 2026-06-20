@@ -10,6 +10,7 @@ Pre-spec one-pagers. Each Idea is a lint-clean problem-direction-MVP one-pager t
 
 | Idea | Status | Date | Owner | Promotes To |
 |------|--------|------|-------|-------------|
+| [adopt-extension-library-architecture](adopt-extension-library-architecture.md) | Approved | 2026-06-20 | alexandertrakhimenok | — |
 | [assetus-model-unification](assetus-model-unification.md) | Specified | 2026-06-18 | alex | assetus-frontend-port, unified-assetus-data-model |
 
 ## Open Questions
