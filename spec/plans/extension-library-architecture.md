@@ -4,7 +4,7 @@ status: Approved
 ---
 # Plan: Extension Library Architecture
 
-**Status:** Approved
+**Status:** Implemented
 **Source:** idea:adopt-extension-library-architecture
 **Date:** 2026-06-20
 **Owner:** alexandertrakhimenok
@@ -80,7 +80,7 @@ Reroute the assetus app's `@sneat/extension-assetus` import(s) onto `@sneat/exte
 
 **Source:** idea:adopt-extension-library-architecture
 **Depends-On:** 5
-**Status:** pending
+**Status:** done
 
 Confirm `ext-assetus` and its `project.json`/`tsconfig` `paths` entry are gone (remove residue) and the three new libs build/lint/test clean. Confirm no dangling `@sneat/extension-assetus` (old) imports remain in-repo.
 

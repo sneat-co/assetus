@@ -18,7 +18,7 @@ This repo hosts two independent toolchains in subdirectories — neither
 | Directory | Stack | Description |
 |-----------|-------|-------------|
 | [`backend/`](backend) | Go 1.26 | The `assetus` space module (Firestore via dalgo under `/spaces/{spaceID}/ext/assetus/...`) |
-| [`frontend/`](frontend) | Nx · Angular · Ionic · pnpm | The `assetus-app` standalone app and the `@sneat/extension-assetus` library |
+| [`frontend/`](frontend) | Nx · Angular · Ionic · pnpm | The `assetus-app` standalone app and the `@sneat/extension-assetus-*` libraries (see [Frontend](#frontend)) |
 
 ## Backend
 
@@ -50,3 +50,36 @@ go test ./...
   `community`→Community and `school`→School once those `spaceus` space types ship).
 
 Spec: [`sneat-co/backstage` → `spec/features/assetus-mvp`](https://github.com/sneat-co/backstage/tree/main/spec/features/assetus-mvp).
+
+## Frontend
+
+```bash
+cd frontend
+pnpm install
+npx nx build assetus-app
+npx nx run-many -t lint test
+```
+
+### Library structure (extension library-architecture convention)
+
+The assetus frontend follows the **extension library-architecture** convention —
+an extension is split into three libraries by *runtime weight* and *visibility*,
+so other repos can depend on a light **contract** instead of the full bundle, and
+cross-extension calls go through dependency-inverted `InjectionToken`s rather than
+direct implementation imports. The convention is defined in
+[`sneat-co/sneat-libs` → `spec/features/extension-library-architecture`](https://github.com/sneat-co/sneat-libs/tree/main/spec/features/extension-library-architecture/README.md).
+
+| Lib | nx tags | Holds | May depend on |
+|-----|---------|-------|---------------|
+| [`@sneat/extension-assetus-contract`](frontend/libs/extensions/assetus/contract) | `type:contract` | Asset DTOs/types/enums + the `ASSET_SERVICE` `InjectionToken` (`IAssetService`). Runtime-light — no components/services. | other contracts + foundational `@sneat/*` |
+| [`@sneat/extension-assetus-shared`](frontend/libs/extensions/assetus/shared) | `type:shared` | The app-facing UI: routing, pages, components, space-menu. Obtains services via the `ASSET_SERVICE` token. | `-contract` + foundational — **never `-internal`** |
+| [`@sneat/extension-assetus-internal`](frontend/libs/extensions/assetus/internal) | `type:internal` | `AssetService` + `provideAssetusInternal()`. Private implementation. | `-contract` / `-shared` + foundational |
+
+The boundary matrix is enforced by `@nx/enforce-module-boundaries` in
+`frontend/eslint.config.mjs` (a `type:shared → type:internal` import fails lint).
+`-internal` is consumed only by the composition-root **app**, which wires
+`provideAssetusInternal()` at bootstrap (`frontend/apps/assetus-app/src/main.ts`)
+to bind `ASSET_SERVICE` to the concrete `AssetService`.
+
+The local plan that performed this split:
+[`spec/plans/extension-library-architecture.md`](spec/plans/extension-library-architecture.md).
