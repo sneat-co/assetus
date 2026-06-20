@@ -8,11 +8,11 @@ import {
   IAssetDboBase,
   IAssetExtra,
   IAssetDwellingExtra,
-} from '../../../dto';
+} from '@sneat/extension-assetus-contract';
 import {
   IAssetContext,
   IAssetDwellingContext,
-} from '../../../contexts';
+} from '@sneat/extension-assetus-contract';
 import { SpaceComponentBaseParams } from '@sneat/space-components';
 import { AddAssetBaseComponent } from '../add-asset-base.component';
 import { AddDwellingCardComponent } from '../../edit-dwelling-card/edit-dwelling-card.component';

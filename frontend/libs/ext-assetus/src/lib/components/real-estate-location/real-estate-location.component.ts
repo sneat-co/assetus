@@ -8,7 +8,7 @@ import {
   IonLabel,
   IonTextarea,
 } from '@ionic/angular/standalone';
-import { IAssetContext } from '../../contexts';
+import { IAssetContext } from '@sneat/extension-assetus-contract';
 
 // Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({

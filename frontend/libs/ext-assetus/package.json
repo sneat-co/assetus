@@ -18,6 +18,7 @@
     "@sneat/contactus-services": "^0.9.0",
     "@sneat/core": "^0.9.0",
     "@sneat/dto": "^0.9.0",
+    "@sneat/extension-assetus-contract": "^0.0.5",
     "@sneat/space-components": "^0.9.0",
     "@sneat/space-models": "^0.9.0",
     "@sneat/space-services": "^0.9.0",

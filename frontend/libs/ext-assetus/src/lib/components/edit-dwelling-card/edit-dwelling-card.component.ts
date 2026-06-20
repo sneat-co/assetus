@@ -9,7 +9,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonCard, IonInput, IonItem, IonList } from '@ionic/angular/standalone';
 import { CountrySelectorComponent } from '@sneat/components';
-import { IAssetContext, IAssetDwellingContext } from '../../contexts';
+import { IAssetContext, IAssetDwellingContext } from '@sneat/extension-assetus-contract';
 import { ISpaceContext } from '@sneat/space-models';
 import { AssetPossessionCardComponent } from '../asset-possession-card/asset-possession-card.component';
 

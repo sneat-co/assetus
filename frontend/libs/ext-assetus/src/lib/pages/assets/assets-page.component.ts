@@ -27,7 +27,7 @@ import {
 import { ClassName } from '@sneat/ui';
 import { takeUntil } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { IAssetDbo } from '../../dto';
+import { IAssetDbo } from '@sneat/extension-assetus-contract';
 import { AssetService, AssetusCoreServicesModule } from '../../services';
 import { NewAssetDialogComponent } from './new-asset-dialog.component';
 

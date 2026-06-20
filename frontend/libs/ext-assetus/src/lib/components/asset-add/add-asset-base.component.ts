@@ -6,8 +6,13 @@ import {
 } from '@angular/forms';
 import { ISpaceContext } from '@sneat/space-models';
 import { SpaceBaseComponent } from '@sneat/space-components';
-import { AssetExtraType, IAssetDboBase, IAssetExtra } from '../../dto';
-import { AssetService, ICreateAssetRequest } from '../../services';
+import {
+  AssetExtraType,
+  IAssetDboBase,
+  IAssetExtra,
+  ICreateAssetRequest,
+} from '@sneat/extension-assetus-contract';
+import { AssetService } from '../../services';
 
 // Lib-local base component for the three asset-add components. Ported from the
 // legacy legacy ext-assetus-components AddAssetBaseComponent so the components

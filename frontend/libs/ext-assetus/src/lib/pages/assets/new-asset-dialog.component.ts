@@ -25,8 +25,9 @@ import {
   conditionOptions,
   defaultVisibilityForSpaceType,
   visibilityOptions,
-} from '../../dto';
-import { AssetService, ICreateAssetRequest } from '../../services';
+  ICreateAssetRequest,
+} from '@sneat/extension-assetus-contract';
+import { AssetService } from '../../services';
 
 // Create-asset dialog (Task 8). Collects name, category, condition and a
 // visibility that defaults to the owning space's default but can be overridden.

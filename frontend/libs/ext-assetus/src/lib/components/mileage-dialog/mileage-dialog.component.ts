@@ -23,8 +23,9 @@ import {
   FuelVolumeUnit,
   MileageUnit,
   MileageUnitTypes,
-} from '../../dto';
-import { AssetService, ICreateVehicleRecordRequest } from '../../services';
+  ICreateVehicleRecordRequest,
+} from '@sneat/extension-assetus-contract';
+import { AssetService } from '../../services';
 import { ISpaceBrief } from '@sneat/dto';
 
 // Ported from legacy ext-assetus-components (legacy assetus components lib).

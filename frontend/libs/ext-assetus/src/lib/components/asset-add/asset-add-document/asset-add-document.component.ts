@@ -18,11 +18,11 @@ import {
   IAssetDboBase,
   IAssetExtra,
   IAssetDocumentExtra,
-} from '../../../dto';
+} from '@sneat/extension-assetus-contract';
 import {
   IAssetContext,
   IAssetDocumentContext,
-} from '../../../contexts';
+} from '@sneat/extension-assetus-contract';
 import { SpaceComponentBaseParams } from '@sneat/space-components';
 import { format, parseISO } from 'date-fns';
 import { AddAssetBaseComponent } from '../add-asset-base.component';

@@ -14,9 +14,11 @@ import { SneatApiService } from '@sneat/api';
 import { ISpaceContext } from '@sneat/space-models';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { IAssetContext } from '../contexts';
-import { IAssetDbo, IHistoryEvent } from '../dto';
 import {
+  IAssetContext,
+  IAssetDbo,
+  IHistoryEvent,
+  IIdAndAssetDbo,
   ICreateVehicleRecordRequest,
   ICreateVehicleRecordResponse,
   IAssetHistoryResponse,
@@ -27,15 +29,7 @@ import {
   ITransferAssetRequest,
   ITransferAssetResponse,
   IUpdateAssetRequest,
-} from './interfaces';
-
-// An asset document plus its Firestore id (the `id` field is merged in by
-// collectionData's idField option). Local alias to avoid guessing a generic
-// @sneat/core helper name.
-export interface IIdAndAssetDbo {
-  id: string;
-  dbo: IAssetDbo;
-}
+} from '@sneat/extension-assetus-contract';
 
 // A history doc as stored in Firestore: identical to IHistoryEvent except
 // occurredAt is a Firestore Timestamp (converted back to an ISO string when

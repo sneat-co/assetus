@@ -23,7 +23,7 @@ import {
   SpaceComponentBaseParams,
 } from '@sneat/space-components';
 import { ClassName } from '@sneat/ui';
-import { AssetCategory } from '../../dto';
+import { AssetCategory } from '@sneat/extension-assetus-contract';
 
 interface INewAssetCategory {
   readonly id: AssetCategory;

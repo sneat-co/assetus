@@ -25,7 +25,7 @@ import {
   conditionOptions,
   IAssetDbo,
   visibilityOptions,
-} from '../../dto';
+} from '@sneat/extension-assetus-contract';
 import { AssetService, AssetusCoreServicesModule } from '../../services';
 import { AssetHistoryTimelineComponent } from '../../components/asset-history-timeline/asset-history-timeline.component';
 

@@ -40,7 +40,7 @@ Add the `type:contract`/`type:shared`/`type:internal` tag taxonomy and a tier de
 
 **Source:** idea:adopt-extension-library-architecture
 **Depends-On:** 1
-**Status:** pending
+**Status:** done
 
 Move pure types from `ext-assetus` (`dto`, `contexts`, `uimodels`, `data`, `constants`, `services/interfaces.ts`) into `extension-assetus-contract`, runtime-light. Define `ASSET_SERVICE` + `IAssetService` (interface derived from how the shared UI uses `AssetService`). Repoint references; delete moved symbols from `ext-assetus`.
 

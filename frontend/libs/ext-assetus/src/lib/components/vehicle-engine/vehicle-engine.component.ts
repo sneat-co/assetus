@@ -10,8 +10,8 @@ import {
   EngineTypes,
   FuelType,
   FuelTypes,
-} from '../../dto';
-import { IAssetVehicleContext } from '../../contexts';
+} from '@sneat/extension-assetus-contract';
+import { IAssetVehicleContext } from '@sneat/extension-assetus-contract';
 
 // Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({

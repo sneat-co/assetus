@@ -16,7 +16,7 @@ import {
   IonText,
 } from '@ionic/angular/standalone';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
-import { IHistoryEvent } from '../../dto';
+import { IHistoryEvent } from '@sneat/extension-assetus-contract';
 import { AssetService } from '../../services';
 
 // Append-only asset history timeline (Task 11). Renders every recorded event,

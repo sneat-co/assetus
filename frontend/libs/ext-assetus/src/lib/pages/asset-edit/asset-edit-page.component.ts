@@ -33,7 +33,7 @@ import {
   conditionOptions,
   IAssetDbo,
   visibilityOptions,
-} from '../../dto';
+} from '@sneat/extension-assetus-contract';
 import { AssetService, AssetusCoreServicesModule } from '../../services';
 import { TransferAssetComponent } from '../transfer/transfer-asset.component';
 

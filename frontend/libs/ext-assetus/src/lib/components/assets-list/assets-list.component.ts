@@ -16,7 +16,7 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { IIdAndBrief } from '@sneat/core';
-import { AssetCategory, IAssetDbo } from '../../dto';
+import { AssetCategory, IAssetDbo } from '@sneat/extension-assetus-contract';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import { ISpaceContext } from '@sneat/space-models';
 import { SpaceNavService } from '@sneat/space-services';

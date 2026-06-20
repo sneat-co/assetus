@@ -13,7 +13,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { IIdAndBrief } from '@sneat/core';
-import { IAssetBrief } from '../../dto';
+import { IAssetBrief } from '@sneat/extension-assetus-contract';
 import { AssetsListComponent } from '../../components';
 import {
   SpaceBaseComponent,

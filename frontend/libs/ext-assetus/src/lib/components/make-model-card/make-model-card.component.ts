@@ -8,8 +8,8 @@ import {
 import { FormsModule } from '@angular/forms';
 import { IonInput, IonItem } from '@ionic/angular/standalone';
 import { SelectFromListComponent } from '@sneat/ui';
-import { AssetType } from '../../dto';
-import { carMakes, IMake, IModel } from '../../data';
+import { AssetType } from '@sneat/extension-assetus-contract';
+import { carMakes, IMake, IModel } from '@sneat/extension-assetus-contract';
 
 // Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({

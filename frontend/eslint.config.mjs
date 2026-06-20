@@ -57,7 +57,7 @@ export default [
             },
             {
               sourceTag: 'type:lib',
-              onlyDependOnLibsWithTags: ['type:lib'],
+              onlyDependOnLibsWithTags: ['type:lib', 'type:contract'],
             },
           ],
         },

@@ -11,11 +11,11 @@ import {
   IAssetDboBase,
   IAssetExtra,
   IAssetVehicleExtra,
-} from '../../../dto';
+} from '@sneat/extension-assetus-contract';
 import {
   IAssetContext,
   IAssetVehicleContext,
-} from '../../../contexts';
+} from '@sneat/extension-assetus-contract';
 import { format, parseISO } from 'date-fns';
 import { AddAssetBaseComponent } from '../add-asset-base.component';
 import { VehicleCardComponent } from '../../vehicle-card/vehicle-card.component';

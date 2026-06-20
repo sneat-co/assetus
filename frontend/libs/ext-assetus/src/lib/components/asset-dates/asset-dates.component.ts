@@ -7,7 +7,7 @@ import {
   IonItemGroup,
   IonLabel,
 } from '@ionic/angular/standalone';
-import { IAssetDboBase, IAssetVehicleExtra } from '../../dto';
+import { IAssetDboBase, IAssetVehicleExtra } from '@sneat/extension-assetus-contract';
 
 interface AssetDate {
   name: string;

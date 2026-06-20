@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { Observable, of } from 'rxjs';
 import { spacePageTestProviders } from '../../../testing/test-providers';
-import { IAssetContext } from '../../contexts';
-import { IAssetDbo } from '../../dto';
+import { IAssetContext } from '@sneat/extension-assetus-contract';
+import { IAssetDbo } from '@sneat/extension-assetus-contract';
 import { AssetService } from '../../services';
 import { AssetPageComponent } from './asset-page.component';
 

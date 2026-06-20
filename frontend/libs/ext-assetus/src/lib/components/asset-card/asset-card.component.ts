@@ -9,7 +9,7 @@ import {
   IonLabel,
 } from '@ionic/angular/standalone';
 import { Period } from '@sneat/dto';
-import { IAssetContext } from '../../contexts';
+import { IAssetContext } from '@sneat/extension-assetus-contract';
 
 // Ported from legacy ext-assetus-components (legacy assetus components lib).
 @Component({

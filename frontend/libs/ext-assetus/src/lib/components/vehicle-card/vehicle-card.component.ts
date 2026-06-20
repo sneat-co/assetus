@@ -15,9 +15,9 @@ import {
   IonList,
 } from '@ionic/angular/standalone';
 import { CountrySelectorComponent } from '@sneat/components';
-import { carMakes } from '../../data';
-import { IAssetContext, IAssetVehicleContext } from '../../contexts';
-import { IAssetVehicleExtra } from '../../dto';
+import { carMakes } from '@sneat/extension-assetus-contract';
+import { IAssetContext, IAssetVehicleContext } from '@sneat/extension-assetus-contract';
+import { IAssetVehicleExtra } from '@sneat/extension-assetus-contract';
 import { ISpaceContext } from '@sneat/space-models';
 import { AssetPossessionCardComponent } from '../asset-possession-card/asset-possession-card.component';
 import { AssetRegNumberInputComponent } from '../asset-reg-number-input/asset-reg-number-input.component';
