@@ -7,12 +7,13 @@ import {
 import { ISpaceContext } from '@sneat/space-models';
 import { SpaceBaseComponent } from '@sneat/space-components';
 import {
+  ASSET_SERVICE,
   AssetExtraType,
   IAssetDboBase,
   IAssetExtra,
+  IAssetService,
   ICreateAssetRequest,
 } from '@sneat/extension-assetus-contract';
-import { AssetService } from '../../services';
 
 // Lib-local base component for the three asset-add components. Ported from the
 // legacy legacy ext-assetus-components AddAssetBaseComponent so the components
@@ -29,7 +30,7 @@ export abstract class AddAssetBaseComponent extends SpaceBaseComponent {
     title: new FormControl<string>('', Validators.required),
   });
 
-  protected readonly assetService = inject(AssetService);
+  protected readonly assetService: IAssetService = inject(ASSET_SERVICE);
 
   // Accepts the legacy `{ asset, spaceID }` envelope the add-asset components
   // build, translates it into the lib's flat ICreateAssetRequest, creates the

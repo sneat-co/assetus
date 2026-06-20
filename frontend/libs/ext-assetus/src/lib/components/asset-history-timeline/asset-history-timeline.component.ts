@@ -16,8 +16,11 @@ import {
   IonText,
 } from '@ionic/angular/standalone';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
-import { IHistoryEvent } from '@sneat/extension-assetus-contract';
-import { AssetService } from '../../services';
+import {
+  ASSET_SERVICE,
+  IAssetService,
+  IHistoryEvent,
+} from '@sneat/extension-assetus-contract';
 
 // Append-only asset history timeline (Task 11). Renders every recorded event,
 // including the Transferred entry with its prior and new owner.
@@ -36,7 +39,7 @@ import { AssetService } from '../../services';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetHistoryTimelineComponent implements OnChanges {
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
   private readonly errorLogger = inject<IErrorLogger>(ErrorLogger);
 
   @Input() spaceID?: string;

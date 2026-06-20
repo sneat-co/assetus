@@ -26,15 +26,16 @@ import {
 import { ClassName } from '@sneat/ui';
 import { take, takeUntil } from 'rxjs/operators';
 import {
+  ASSET_SERVICE,
   AssetCategory,
   AssetCondition,
   AssetVisibility,
   categoryOptions,
   conditionOptions,
   IAssetDbo,
+  IAssetService,
   visibilityOptions,
 } from '@sneat/extension-assetus-contract';
-import { AssetService, AssetusCoreServicesModule } from '../../services';
 import { TransferAssetComponent } from '../transfer/transfer-asset.component';
 
 // Asset manage/edit page (route `asset/:assetID/edit`). Loads the asset ONCE for
@@ -47,7 +48,6 @@ import { TransferAssetComponent } from '../transfer/transfer-asset.component';
   templateUrl: './asset-edit-page.component.html',
   imports: [
     FormsModule,
-    AssetusCoreServicesModule,
     SpaceServiceModule,
     IonHeader,
     IonToolbar,
@@ -70,7 +70,7 @@ import { TransferAssetComponent } from '../transfer/transfer-asset.component';
   ],
 })
 export class AssetEditPageComponent extends SpaceBaseComponent {
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
   private readonly modalCtrl = inject(ModalController);
   private readonly alertCtrl = inject(AlertController);
 

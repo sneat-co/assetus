@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { WritableSignal } from '@angular/core';
 import { EMPTY } from 'rxjs';
-import { AssetService } from '../../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { spacePageTestProviders } from '../../../../testing/test-providers';
 import { AssetAddDwellingComponent } from './asset-add-dwelling.component';
 
@@ -34,7 +34,7 @@ describe('AssetAddDwellingComponent', () => {
       imports: [AssetAddDwellingComponent],
       providers: [
         ...spacePageTestProviders(),
-        { provide: AssetService, useValue: { createAsset } },
+        { provide: ASSET_SERVICE, useValue: { createAsset } },
       ],
     });
     fixture = TestBed.createComponent(AssetAddDwellingComponent);

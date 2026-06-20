@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ModalController } from '@ionic/angular/standalone';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { of } from 'rxjs';
 import { componentTestProviders } from '../../../testing/test-providers';
 import { MileAgeDialogComponent } from './mileage-dialog.component';
@@ -22,7 +22,7 @@ describe('MileAgeDialogComponent', () => {
       imports: [MileAgeDialogComponent],
       providers: [
         ...componentTestProviders(),
-        { provide: AssetService, useValue: { addVehicleRecord } },
+        { provide: ASSET_SERVICE, useValue: { addVehicleRecord } },
         { provide: ModalController, useValue: { dismiss } },
       ],
     });

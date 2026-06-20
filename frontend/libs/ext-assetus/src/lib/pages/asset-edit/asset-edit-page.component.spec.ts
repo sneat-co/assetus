@@ -3,14 +3,13 @@ import { Observable, of } from 'rxjs';
 import { spacePageTestProviders } from '../../../testing/test-providers';
 import { IAssetContext } from '@sneat/extension-assetus-contract';
 import { IAssetDbo } from '@sneat/extension-assetus-contract';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { AssetEditPageComponent } from './asset-edit-page.component';
 
 // Render + behaviour spec for AssetEditPageComponent (the manage page). It loads
 // the asset ONCE for prefill via watchAssetByID(space, id).pipe(take(1)), edits
 // it via updateAsset, and hosts archive/hard-delete via removeAsset. A stub
-// AssetService is provided at the component scope (AssetusCoreServicesModule
-// provides AssetService there), mirroring the view-page spec.
+// ASSET_SERVICE is provided at the component scope, mirroring the view-page spec.
 describe('AssetEditPageComponent', () => {
   const dbo: IAssetDbo = {
     name: 'My Car',
@@ -42,7 +41,7 @@ describe('AssetEditPageComponent', () => {
       providers: [...spacePageTestProviders()],
     });
     TestBed.overrideComponent(AssetEditPageComponent, {
-      add: { providers: [{ provide: AssetService, useValue: serviceStub }] },
+      add: { providers: [{ provide: ASSET_SERVICE, useValue: serviceStub }] },
     });
   });
 

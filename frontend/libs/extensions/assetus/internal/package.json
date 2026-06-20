@@ -5,6 +5,12 @@
     "access": "public"
   },
   "peerDependencies": {
+    "@angular/core": "^21.0.0",
+    "@angular/fire": "^20.0.0",
+    "rxjs": "^7.0.0",
+    "@sneat/api": "^0.9.0",
+    "@sneat/extension-assetus-contract": "^0.0.5",
+    "@sneat/space-models": "^0.9.0",
     "vitest": "^4.0.9"
   },
   "sideEffects": false

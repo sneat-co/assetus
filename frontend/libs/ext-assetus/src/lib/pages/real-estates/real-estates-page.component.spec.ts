@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { SpaceNavService } from '@sneat/space-services';
 import { spacePageTestProviders } from '../../../testing/test-providers';
 import { RealEstatesPageComponent } from './real-estates-page.component';
@@ -13,7 +13,7 @@ describe('RealEstatesPageComponent', () => {
       imports: [RealEstatesPageComponent],
       providers: [
         ...spacePageTestProviders(),
-        { provide: AssetService, useValue: { removeAsset: vi.fn() } },
+        { provide: ASSET_SERVICE, useValue: { removeAsset: vi.fn() } },
         {
           provide: SpaceNavService,
           useValue: { navigateForwardToSpacePage: vi.fn(() => Promise.resolve(true)) },

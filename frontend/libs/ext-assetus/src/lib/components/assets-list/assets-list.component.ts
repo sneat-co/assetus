@@ -16,11 +16,15 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { IIdAndBrief } from '@sneat/core';
-import { AssetCategory, IAssetDbo } from '@sneat/extension-assetus-contract';
+import {
+  ASSET_SERVICE,
+  AssetCategory,
+  IAssetDbo,
+  IAssetService,
+} from '@sneat/extension-assetus-contract';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import { ISpaceContext } from '@sneat/space-models';
 import { SpaceNavService } from '@sneat/space-services';
-import { AssetService } from '../../services';
 import { MileAgeDialogComponent } from '../mileage-dialog/mileage-dialog.component';
 
 // Ported from legacy ext-assetus-components (legacy assetus components lib).
@@ -40,7 +44,7 @@ import { MileAgeDialogComponent } from '../mileage-dialog/mileage-dialog.compone
 })
 export class AssetsListComponent implements OnChanges {
   private readonly errorLogger = inject<IErrorLogger>(ErrorLogger);
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
   private readonly spaceNavService = inject(SpaceNavService);
   private readonly modalCtrl = inject(ModalController);
 

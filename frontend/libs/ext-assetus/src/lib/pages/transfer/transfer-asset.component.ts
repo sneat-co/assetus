@@ -18,7 +18,10 @@ import { ErrorLogger, IErrorLogger, IIdAndBrief } from '@sneat/core';
 import { IUserSpaceBrief } from '@sneat/auth-models';
 import { SneatUserService } from '@sneat/auth-core';
 import { zipMapBriefsWithIDs } from '@sneat/space-models';
-import { AssetService } from '../../services';
+import {
+  ASSET_SERVICE,
+  IAssetService,
+} from '@sneat/extension-assetus-contract';
 
 // Transfer flow (Task 11): pick a destination space and reassign the asset to
 // it via AssetService.transferAsset(). The backend records the append-only
@@ -43,7 +46,7 @@ import { AssetService } from '../../services';
 })
 export class TransferAssetComponent implements OnInit {
   private readonly modalCtrl = inject(ModalController);
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
   private readonly userService = inject(SneatUserService);
   private readonly errorLogger = inject<IErrorLogger>(ErrorLogger);
 

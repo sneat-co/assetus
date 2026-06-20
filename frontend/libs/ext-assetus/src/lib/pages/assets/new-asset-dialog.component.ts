@@ -18,6 +18,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import {
+  ASSET_SERVICE,
   AssetCategory,
   AssetCondition,
   AssetVisibility,
@@ -25,9 +26,9 @@ import {
   conditionOptions,
   defaultVisibilityForSpaceType,
   visibilityOptions,
+  IAssetService,
   ICreateAssetRequest,
 } from '@sneat/extension-assetus-contract';
-import { AssetService } from '../../services';
 
 // Create-asset dialog (Task 8). Collects name, category, condition and a
 // visibility that defaults to the owning space's default but can be overridden.
@@ -55,7 +56,7 @@ import { AssetService } from '../../services';
 })
 export class NewAssetDialogComponent implements OnInit {
   private readonly modalCtrl = inject(ModalController);
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
   private readonly errorLogger = inject<IErrorLogger>(ErrorLogger);
 
   @Input({ required: true }) spaceID!: string;

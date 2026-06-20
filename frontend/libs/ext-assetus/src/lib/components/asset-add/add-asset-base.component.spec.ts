@@ -6,7 +6,7 @@ import { ClassName } from '@sneat/ui';
 import { SpaceComponentBaseParams } from '@sneat/space-components';
 import { ISpaceContext } from '@sneat/space-models';
 import { spacePageTestProviders } from '../../../testing/test-providers';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { AddAssetBaseComponent } from './add-asset-base.component';
 
 // Trivial concrete subclass exposing the protected create flow so the abstract
@@ -40,7 +40,7 @@ describe('AddAssetBaseComponent', () => {
       imports: [TestAddAssetComponent],
       providers: [
         ...spacePageTestProviders(),
-        { provide: AssetService, useValue: { createAsset } },
+        { provide: ASSET_SERVICE, useValue: { createAsset } },
       ],
     });
     const fixture = TestBed.createComponent(TestAddAssetComponent);

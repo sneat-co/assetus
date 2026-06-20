@@ -21,12 +21,13 @@ import { ClassName } from '@sneat/ui';
 import { Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
+  ASSET_SERVICE,
   categoryOptions,
   conditionOptions,
   IAssetDbo,
+  IAssetService,
   visibilityOptions,
 } from '@sneat/extension-assetus-contract';
-import { AssetService, AssetusCoreServicesModule } from '../../services';
 import { AssetHistoryTimelineComponent } from '../../components/asset-history-timeline/asset-history-timeline.component';
 
 // Read-only asset detail page (route `asset/:assetID`). Reads the asset live
@@ -37,7 +38,6 @@ import { AssetHistoryTimelineComponent } from '../../components/asset-history-ti
   selector: 'assetus-asset-page',
   templateUrl: './asset-page.component.html',
   imports: [
-    AssetusCoreServicesModule,
     SpaceServiceModule,
     AssetHistoryTimelineComponent,
     IonHeader,
@@ -58,7 +58,7 @@ import { AssetHistoryTimelineComponent } from '../../components/asset-history-ti
   ],
 })
 export class AssetPageComponent extends SpaceBaseComponent {
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
 
   protected readonly $assetID = signal<string | undefined>(undefined);
   protected readonly $asset = signal<IAssetDbo | undefined>(undefined);

@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { spacePageTestProviders } from '../../../testing/test-providers';
 import { IAssetContext } from '@sneat/extension-assetus-contract';
 import { IAssetDbo } from '@sneat/extension-assetus-contract';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { AssetPageComponent } from './asset-page.component';
 
 // Render spec for AssetPageComponent. This page is now read-only: it reads the
@@ -32,11 +32,10 @@ describe('AssetPageComponent', () => {
       imports: [AssetPageComponent],
       providers: [...spacePageTestProviders()],
     });
-    // The page imports AssetusCoreServicesModule, which provides AssetService at
-    // the component scope; override it at the component level so the page injects
-    // this stub (a root-level override would be shadowed by that module).
+    // The page injects the ASSET_SERVICE token; provide a stub at the component
+    // level so the page resolves this fake instead of the real implementation.
     TestBed.overrideComponent(AssetPageComponent, {
-      add: { providers: [{ provide: AssetService, useValue: serviceStub }] },
+      add: { providers: [{ provide: ASSET_SERVICE, useValue: serviceStub }] },
     });
   });
 

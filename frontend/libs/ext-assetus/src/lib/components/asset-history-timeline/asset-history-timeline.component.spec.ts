@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { componentTestProviders } from '../../../testing/test-providers';
 import { AssetHistoryTimelineComponent } from './asset-history-timeline.component';
 
@@ -21,7 +21,7 @@ describe('AssetHistoryTimelineComponent', () => {
       imports: [AssetHistoryTimelineComponent],
       providers: [
         ...componentTestProviders(),
-        { provide: AssetService, useValue: { getHistory } },
+        { provide: ASSET_SERVICE, useValue: { getHistory } },
       ],
     });
     fixture = TestBed.createComponent(AssetHistoryTimelineComponent);

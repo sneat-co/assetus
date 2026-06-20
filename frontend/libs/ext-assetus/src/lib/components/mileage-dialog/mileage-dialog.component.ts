@@ -16,7 +16,9 @@ import {
 import { IIdAndBrief } from '@sneat/core';
 import { ErrorLogger, IErrorLogger } from '@sneat/core';
 import {
+  ASSET_SERVICE,
   IAssetDbo,
+  IAssetService,
   CurrencyList,
   CurrencyCode,
   FuelVolumeUnitTypes,
@@ -25,7 +27,6 @@ import {
   MileageUnitTypes,
   ICreateVehicleRecordRequest,
 } from '@sneat/extension-assetus-contract';
-import { AssetService } from '../../services';
 import { ISpaceBrief } from '@sneat/dto';
 
 // Ported from legacy ext-assetus-components (legacy assetus components lib).
@@ -49,7 +50,7 @@ import { ISpaceBrief } from '@sneat/dto';
 })
 export class MileAgeDialogComponent {
   private readonly errorLogger = inject<IErrorLogger>(ErrorLogger);
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
   private readonly modalCtrl = inject(ModalController);
 
   @Input() space?: IIdAndBrief<ISpaceBrief>;

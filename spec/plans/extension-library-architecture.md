@@ -50,7 +50,7 @@ Move pure types from `ext-assetus` (`dto`, `contexts`, `uimodels`, `data`, `cons
 
 **Source:** idea:adopt-extension-library-architecture
 **Depends-On:** 2
-**Status:** pending
+**Status:** done
 
 Move `AssetService` and `assetus-core-services.module.ts` into `extension-assetus-internal`; bind `ASSET_SERVICE` to `AssetService` via `provideAssetusInternal(): Provider[]`. No other lib imports `-internal`. Drop the emptied services dir from `ext-assetus`.
 

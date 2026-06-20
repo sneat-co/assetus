@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { spacePageTestProviders } from '../../../testing/test-providers';
 import { NewAssetPageComponent } from './new-asset-page.component';
 
@@ -12,7 +12,7 @@ describe('NewAssetPageComponent', () => {
       imports: [NewAssetPageComponent],
       providers: [
         ...spacePageTestProviders(),
-        { provide: AssetService, useValue: { createAsset: vi.fn() } },
+        { provide: ASSET_SERVICE, useValue: { createAsset: vi.fn() } },
       ],
     }),
   );

@@ -27,8 +27,11 @@ import {
 import { ClassName } from '@sneat/ui';
 import { takeUntil } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { IAssetDbo } from '@sneat/extension-assetus-contract';
-import { AssetService, AssetusCoreServicesModule } from '../../services';
+import {
+  ASSET_SERVICE,
+  IAssetDbo,
+  IAssetService,
+} from '@sneat/extension-assetus-contract';
 import { NewAssetDialogComponent } from './new-asset-dialog.component';
 
 interface IAssetRow {
@@ -46,7 +49,6 @@ type AssetsFilter = 'active' | 'archived';
   templateUrl: './assets-page.component.html',
   imports: [
     FormsModule,
-    AssetusCoreServicesModule,
     ContactusServicesModule,
     SpaceServiceModule,
     IonHeader,
@@ -71,7 +73,7 @@ type AssetsFilter = 'active' | 'archived';
   ],
 })
 export class AssetsPageComponent extends SpaceBaseComponent {
-  private readonly assetService = inject(AssetService);
+  private readonly assetService: IAssetService = inject(ASSET_SERVICE);
   private readonly modalCtrl = inject(ModalController);
 
   protected readonly $assets = signal<IAssetRow[]>([]);

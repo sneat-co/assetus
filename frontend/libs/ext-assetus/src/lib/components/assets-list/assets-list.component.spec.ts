@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ModalController, provideIonicAngular } from '@ionic/angular/standalone';
-import { AssetService } from '../../services';
+import { ASSET_SERVICE } from '@sneat/extension-assetus-contract';
 import { SpaceNavService } from '@sneat/space-services';
 import { of } from 'rxjs';
 import { componentTestProviders } from '../../../testing/test-providers';
@@ -53,7 +53,7 @@ describe('AssetsListComponent', () => {
       providers: [
         ...componentTestProviders(),
         provideIonicAngular(),
-        { provide: AssetService, useValue: { removeAsset } },
+        { provide: ASSET_SERVICE, useValue: { removeAsset } },
         {
           provide: SpaceNavService,
           useValue: { navigateForwardToSpacePage: navigate },
