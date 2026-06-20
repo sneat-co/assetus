@@ -70,7 +70,7 @@ Move the app-facing routing, pages (9 page groups), the ~28 components, and `spa
 
 **Source:** idea:adopt-extension-library-architecture
 **Depends-On:** 4
-**Status:** pending
+**Status:** done
 
 Reroute the assetus app's `@sneat/extension-assetus` import(s) onto `@sneat/extension-assetus-shared`, and wire `provideAssetusInternal()` at the app bootstrap. Flip the tier matrix in `eslint.config.mjs` from `warn` to `error`. Run full CI (build, lint, test) green; confirm a deliberate forbidden edge (shared → internal) fails lint.
 

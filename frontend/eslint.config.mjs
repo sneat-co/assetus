@@ -48,8 +48,15 @@ export default [
               ],
             },
             {
+              // The app is the composition root: it may consume every tier,
+              // including type:internal (to wire provider factories at bootstrap).
               sourceTag: 'type:app',
-              onlyDependOnLibsWithTags: ['type:lib'],
+              onlyDependOnLibsWithTags: [
+                'type:lib',
+                'type:contract',
+                'type:shared',
+                'type:internal',
+              ],
             },
             {
               sourceTag: 'type:e2e',
