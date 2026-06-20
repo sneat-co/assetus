@@ -30,7 +30,7 @@ Same hard-cutover model proven on contactus/calendarius: move, never copy; one d
 
 **Source:** idea:adopt-extension-library-architecture
 **Depends-On:** —
-**Status:** pending
+**Status:** done
 
 Add the `type:contract`/`type:shared`/`type:internal` tag taxonomy and a tier dependency matrix to `eslint.config.mjs`'s `enforce-module-boundaries` (initially `warn`). Scaffold empty `@sneat/extension-assetus-contract`, `@sneat/extension-assetus-shared`, and `@sneat/extension-assetus-internal` libs (mirroring `ext-assetus` config), with tier + `scope:assetus` tags. Add `paths` for `-contract` and `-shared` only; omit `-internal`.
 

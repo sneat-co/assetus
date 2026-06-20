@@ -25,6 +25,29 @@ export default [
               onlyDependOnLibsWithTags: ['scope:assetus'],
             },
             {
+              sourceTag: 'type:contract',
+              onlyDependOnLibsWithTags: ['type:contract', 'scope:foundation'],
+            },
+            {
+              sourceTag: 'type:shared',
+              onlyDependOnLibsWithTags: [
+                'type:contract',
+                'type:shared',
+                'scope:foundation',
+                'scope:assetus',
+              ],
+            },
+            {
+              sourceTag: 'type:internal',
+              onlyDependOnLibsWithTags: [
+                'type:contract',
+                'type:shared',
+                'type:internal',
+                'scope:foundation',
+                'scope:assetus',
+              ],
+            },
+            {
               sourceTag: 'type:app',
               onlyDependOnLibsWithTags: ['type:lib'],
             },

@@ -15,7 +15,13 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@sneat/extension-assetus": ["./libs/ext-assetus/src/index.ts"]
+      "@sneat/extension-assetus": ["./libs/ext-assetus/src/index.ts"],
+      "@sneat/extension-assetus-contract": [
+        "./libs/extensions/assetus/contract/src/index.ts"
+      ],
+      "@sneat/extension-assetus-shared": [
+        "./libs/extensions/assetus/shared/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

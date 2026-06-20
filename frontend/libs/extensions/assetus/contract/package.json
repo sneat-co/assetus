@@ -1,0 +1,11 @@
+{
+  "name": "@sneat/extension-assetus-contract",
+  "version": "0.0.5",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "vitest": "^4.0.9"
+  },
+  "sideEffects": false
+}
