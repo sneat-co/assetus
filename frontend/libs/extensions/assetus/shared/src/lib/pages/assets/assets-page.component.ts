@@ -18,7 +18,7 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
-import { ContactusServicesModule } from '@sneat/contactus-services';
+import { ContactusServicesModule } from '@sneat/extension-contactus-internal';
 import { SpaceServiceModule } from '@sneat/space-services';
 import {
   SpaceBaseComponent,
