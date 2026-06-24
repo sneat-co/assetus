@@ -93,7 +93,9 @@
   },
   "release": {
     "projects": [
-      "ext-assetus-contract"
+      "ext-assetus-contract",
+      "ext-assetus-internal",
+      "ext-assetus-shared"
     ],
     "projectsRelationship": "independent",
     "docker": {
